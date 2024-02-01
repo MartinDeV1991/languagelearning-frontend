@@ -6,7 +6,10 @@ import './quiz.css';
 import QuizAnimation from '../components/QuizAnimation'
 
 const Quiz = () => {
-    const path = `https://language-backend.azurewebsites.net/`;
+    // const path = `https://language-backend.azurewebsites.net/`;
+    const path = `http://localhost:8080/`;
+
+    let user_id = localStorage.getItem('languagelearning_id')
 
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
@@ -33,10 +36,11 @@ const Quiz = () => {
         setHint2(false)
         setHint3(false)
 
+
     }, [currentQuestionIndex])
 
     const startGame = () => {
-        fetch(`${path}api/word`)
+        fetch(`${path}api/word/user/${user_id}`)
             .then((res) => res.json())
             .then((data) => {
                 setQuestions(data.map((item) => item.word));
@@ -53,7 +57,7 @@ const Quiz = () => {
         e.preventDefault();
         const userAnswer = input;
         if (userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()) {
-            if (currentQuestionIndex + 1 <= questions.length - 1) {
+            if (currentQuestionIndex + 1 <= Math.min(questions.length, 10)) {
                 setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
             } else {
                 setFeedback('Congratulations! You completed the quiz.');
@@ -102,6 +106,7 @@ const Quiz = () => {
                     </Form>
                 </div>
             )} {!gameStarted && <Button onClick={startGame}>Start</Button>}
+            {currentQuestionIndex > 0 && <Button onClick={() => setCurrentQuestionIndex(0)}>Restart</Button>}
             <QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
         </div>
     );

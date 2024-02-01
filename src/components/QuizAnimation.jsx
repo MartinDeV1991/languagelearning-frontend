@@ -102,8 +102,8 @@ const QuizAnimation = (props) => {
                 this.doneParticlesCount = this.particlesArray.filter(particle => particle.done &&
                     (particle.originX < this.width * (number / totalNumber)) && particle.originX > this.width * ((number - 1) / totalNumber)).length;
 
-                console.log('Total particle count:', this.totalParticlesCount);
-                console.log('Number of particles with done set to true:', this.doneParticlesCount);
+                // console.log('Total particle count:', this.totalParticlesCount);
+                // console.log('Number of particles with done set to true:', this.doneParticlesCount);
             }
         }
 
