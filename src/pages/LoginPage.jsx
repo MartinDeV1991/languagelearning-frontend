@@ -1,10 +1,10 @@
 import React from 'react'
-// import Login from '../components/Login/Login'
+import Login from '../components/Login'
 
 const LoginPage = () => {
 	return (
 		<div style={{ marginTop: 100 }}>
-			{/* <Login /> */}
+			<Login />
 		</div>
 	)
 }

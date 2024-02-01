@@ -5,6 +5,7 @@ import {
   HomePage,
   LoginPage,
   QuizPage,
+  SignUpPage,
 } from './pages'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/quiz" element={<QuizPage />} />
       </Routes>
     </div>

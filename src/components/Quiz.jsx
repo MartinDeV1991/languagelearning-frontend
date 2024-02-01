@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Form, Button } from 'react-bootstrap'
 import './quiz.css';
+import QuizAnimation from '../components/QuizAnimation'
 
 const Quiz = () => {
     const path = `https://language-backend.azurewebsites.net/`;
@@ -31,7 +32,7 @@ const Quiz = () => {
         setHint1(false)
         setHint2(false)
         setHint3(false)
-        
+
     }, [currentQuestionIndex])
 
     const startGame = () => {
@@ -51,8 +52,6 @@ const Quiz = () => {
     const checkAnswer = (e) => {
         e.preventDefault();
         const userAnswer = input;
-        console.log(userAnswer)
-        console.log(answers)
         if (userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()) {
             if (currentQuestionIndex + 1 <= questions.length - 1) {
                 setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
@@ -84,6 +83,7 @@ const Quiz = () => {
                     {hint3 && <div><strong>hint 3</strong>: {sentenceTranslated[currentQuestionIndex]}</div>}
 
                     <Form onSubmit={checkAnswer}>
+                        <div>Question: {currentQuestionIndex + 1}</div>
                         <div>Translate: {output}</div>
                         <div style={{ color: 'red' }}>{feedback}</div>
 
@@ -93,6 +93,7 @@ const Quiz = () => {
                                 placeholder="Type your answer here"
                                 value={input}
                                 onChange={handleInputChange}
+                                style={{ width: '300px' }}
                             />
                         </Form.Group>
                         <Button variant="primary" type="submit">
@@ -101,7 +102,7 @@ const Quiz = () => {
                     </Form>
                 </div>
             )} {!gameStarted && <Button onClick={startGame}>Start</Button>}
-
+            <QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
         </div>
     );
 };
