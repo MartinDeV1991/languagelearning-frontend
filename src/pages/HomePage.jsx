@@ -1,15 +1,16 @@
-import React from 'react'
-import { Button } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
+import React from "react";
+import { Button } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
 
 const HomePage = () => {
-	let userName = localStorage.getItem('languagelearning_first_name')
-	console.log("username: ", userName)
-	if (userName === undefined) { userName = "defaultUser" }
-
+	let userName = localStorage.getItem("languagelearning_first_name");
+	console.log("username: ", userName);
+	if (userName === undefined) {
+		userName = "defaultUser";
+	}
 
 	return (
-		<div style={{ marginTop: 100 }}>
+		<div className="mt-5">
 			<div>Hello {userName}</div>
 
 			<LinkContainer to={`/login`}>
@@ -24,8 +25,7 @@ const HomePage = () => {
 				</Button>
 			</LinkContainer>
 		</div>
+	);
+};
 
-	)
-}
-
-export default HomePage
+export default HomePage;
