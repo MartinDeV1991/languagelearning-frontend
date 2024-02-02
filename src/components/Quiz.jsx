@@ -6,8 +6,8 @@ import './quiz.css';
 import QuizAnimation from '../components/QuizAnimation'
 
 const Quiz = () => {
-    // const path = `https://language-backend.azurewebsites.net/`;
-    const path = `http://localhost:8080/`;
+    const path = `https://language-backend.azurewebsites.net/`;
+    // const path = `http://localhost:8080/`;
 
     let user_id = localStorage.getItem('languagelearning_id')
 
