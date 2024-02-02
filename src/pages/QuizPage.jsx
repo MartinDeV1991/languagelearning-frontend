@@ -1,12 +1,8 @@
-import React from 'react'
-import Quiz from '../components/Quiz'
+import React from "react";
+import Quiz from "../components/Quiz";
 
 const QuizPage = () => {
-	return (
-		<div style={{ marginTop: 100 }}>
-			<Quiz />
-		</div>
-	)
-}
+	return <Quiz />;
+};
 
-export default QuizPage
+export default QuizPage;
