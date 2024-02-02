@@ -59,8 +59,8 @@ const Login = () => {
 	};
 
 	return (
-		<Container>
-			<h3 className="mt-5 mb-3">Login</h3>
+		<Container className="mt-4">
+			<h3 className="mb-3">Login</h3>
 			<Form onSubmit={handleSubmit}>
 				<Form.Group>
 					<Form.Label>Email</Form.Label>
