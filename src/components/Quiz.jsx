@@ -1,8 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Container } from "react-bootstrap";
 import "./quiz.css";
 import QuizAnimation from "../components/QuizAnimation";
 
@@ -36,7 +35,7 @@ const Quiz = () => {
 		setHint1(false);
 		setHint2(false);
 		setHint3(false);
-	}, [currentQuestionIndex]);
+	}, [currentQuestionIndex, questions]);
 
 	const startGame = () => {
 		fetch(`${path}api/word/user/${user_id}`)
@@ -75,7 +74,7 @@ const Quiz = () => {
 	};
 
 	return (
-		<div className="mt-5">
+		<Container className="mt-4">
 			<h1>Quiz Game with Hints</h1>
 			{gameStarted && (
 				<div>
@@ -128,7 +127,7 @@ const Quiz = () => {
 				<Button onClick={() => setCurrentQuestionIndex(0)}>Restart</Button>
 			)}
 			<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
-		</div>
+		</Container>
 	);
 };
 
