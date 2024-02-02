@@ -1,12 +1,8 @@
-import React from 'react'
-import SignUp from '../components/SignUp'
+import React from "react";
+import SignUp from "../components/SignUp";
 
 const SignUpPage = () => {
-	return (
-		<div style={{ marginTop: 100 }}>
-			<SignUp />
-		</div>
-	)
-}
+	return <SignUp />;
+};
 
-export default SignUpPage
+export default SignUpPage;

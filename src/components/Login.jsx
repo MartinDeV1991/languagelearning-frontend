@@ -1,66 +1,66 @@
-import React, { useState } from 'react'
-import { Container, Form, Button } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { Container, Form, Button } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const path = `https://language-backend.azurewebsites.net/`;
+	const path = `https://language-backend.azurewebsites.net/`;
 
-	const navigate = useNavigate()
-	const [email, setEmail] = useState()
-	const [password, setPassword] = useState()
+	const navigate = useNavigate();
+	const [email, setEmail] = useState();
+	const [password, setPassword] = useState();
 
 	const handleChangeEmail = (e) => {
-		setEmail(e.target.value)
-	}
+		setEmail(e.target.value);
+	};
 
 	const handleChangePassword = (e) => {
-		setPassword(e.target.value)
-	}
+		setPassword(e.target.value);
+	};
 
 	const handleSubmit = (e) => {
-		e.preventDefault()
+		e.preventDefault();
 
 		const loginRequest = {
 			email: email,
 			password: password,
-		}
+		};
 
 		fetch(`${path}api/user/login`, {
-			method: 'POST',
+			method: "POST",
 			headers: {
-				'Content-Type': 'application/json',
+				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(loginRequest),
 		})
 			.then((response) => response.json())
 			.then((data) => {
-                console.log(data)
-                console.log("succesvol ingelogd")
-                console.log(data.success)
-				if (data.status != 404) {
-					localStorage.setItem('languagelearning_token', data.token)
-					localStorage.setItem('languagelearning_first_name', data.firstName)
-                    localStorage.setItem('languagelearning_last_name', data.lastName)
-					localStorage.setItem('languagelearning_id', data.id)
-					navigate(`/`)
+				console.log(data);
+				console.log("succesvol ingelogd");
+				console.log(data.success);
+				if (data.status !== 404) {
+					localStorage.setItem("languagelearning_token", data.token);
+					localStorage.setItem("languagelearning_first_name", data.firstName);
+					localStorage.setItem("languagelearning_last_name", data.lastName);
+					localStorage.setItem("languagelearning_id", data.id);
+					navigate(`/`);
 				} else {
-                    localStorage.setItem('languagelearning_id', 1)
-                    localStorage.setItem('languagelearning_first_name', "User")
-                    navigate(`/`)
-                }
+					localStorage.setItem("languagelearning_id", "1");
+					localStorage.setItem("languagelearning_first_name", "User");
+					navigate(`/`);
+				}
 			})
 			.catch((error) => {
-				console.error('Error:', error)
-				localStorage.setItem('languagelearning_id', 1)
-                localStorage.setItem('languagelearning_first_name', "User")
-				navigate(`/`)
-			})
-	}
+				console.error("Error:", error);
+				localStorage.setItem("languagelearning_id", "1");
+				localStorage.setItem("languagelearning_first_name", "User");
+				navigate(`/`);
+			});
+	};
 
 	return (
 		<Container>
-			<h3 className="mt5 mb-3">Login</h3>
+			<h3 className="mt-5 mb-3">Login</h3>
 			<Form onSubmit={handleSubmit}>
 				<Form.Group>
 					<Form.Label>Email</Form.Label>
@@ -94,7 +94,7 @@ const Login = () => {
 				</LinkContainer>
 			</Form>
 		</Container>
-	)
-}
+	);
+};
 
-export default Login
+export default Login;

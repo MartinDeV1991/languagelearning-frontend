@@ -1,12 +1,8 @@
-import React from 'react'
-import Login from '../components/Login'
+import React from "react";
+import Login from "../components/Login";
 
 const LoginPage = () => {
-	return (
-		<div style={{ marginTop: 100 }}>
-			<Login />
-		</div>
-	)
-}
+	return <Login />;
+};
 
-export default LoginPage
+export default LoginPage;
