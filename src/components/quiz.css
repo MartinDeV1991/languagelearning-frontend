@@ -1,26 +1,20 @@
-body {
-    font-family: Arial, sans-serif;
-    text-align: left;
-    margin: 50px;
-}
-
 #output {
-    font-size: 18px;
-    margin-bottom: 20px;
+	font-size: 18px;
+	margin-bottom: 20px;
 }
 
 #inputBox {
-    margin-top: 20px;
+	margin-top: 20px;
 }
 
 #hintButtons {
-    margin-top: 10px;
+	margin-top: 10px;
 }
 
 button {
-    margin: 5px;
+	margin: 5px !important;
 }
 
 .hintOn {
-    background-color: lightblue;
+	background-color: lightblue;
 }

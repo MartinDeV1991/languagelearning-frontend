@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 
 const HomePage = () => {
@@ -10,8 +10,8 @@ const HomePage = () => {
 	}
 
 	return (
-		<div className="mt-5">
-			<div>Hello {userName}</div>
+		<Container className="mt-4">
+			<h1>Hello {userName}</h1>
 
 			<LinkContainer to={`/login`}>
 				<Button className="mt-3 ms-3" variant="primary">
@@ -24,7 +24,7 @@ const HomePage = () => {
 					Go to quiz
 				</Button>
 			</LinkContainer>
-		</div>
+		</Container>
 	);
 };
 

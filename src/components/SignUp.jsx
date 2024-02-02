@@ -58,8 +58,8 @@ const SignUp = () => {
 	};
 
 	return (
-		<Container>
-			<h3 className="mt-5 mb-3">Sign up</h3>
+		<Container className="mt-4">
+			<h3 className="mb-3">Sign up</h3>
 			<Form onSubmit={handleSubmit}>
 				<Form.Group>
 					<Form.Label>First Name</Form.Label>

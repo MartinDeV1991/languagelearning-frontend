@@ -6,7 +6,7 @@ export default function TopNav() {
 	return (
 		<Navbar bg="primary" data-bs-theme="dark">
 			<Container>
-				<Navbar.Brand href="/">Navbar</Navbar.Brand>
+				<Navbar.Brand href="/">WordLog</Navbar.Brand>
 				<Nav className="me-auto">
 					<LinkContainer to={"/"}>
 						<Nav.Link>Home</Nav.Link>
@@ -16,7 +16,12 @@ export default function TopNav() {
 					</LinkContainer>
 				</Nav>
 				<Nav className="ms-auto">
-					<NavDropdown title="My account" id="basic-nav-dropdown" align="end">
+					<NavDropdown
+						title="My account"
+						id="basic-nav-dropdown"
+						align="end"
+						data-bs-theme="light"
+					>
 						<LinkContainer to={"/login"}>
 							<NavDropdown.Item>Log in</NavDropdown.Item>
 						</LinkContainer>
