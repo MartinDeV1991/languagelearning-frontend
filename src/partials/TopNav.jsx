@@ -14,6 +14,9 @@ export default function TopNav() {
 					<LinkContainer to={"/quiz"}>
 						<Nav.Link>Quiz</Nav.Link>
 					</LinkContainer>
+					<LinkContainer to={"/words"}>
+						<Nav.Link>Words</Nav.Link>
+					</LinkContainer>
 				</Nav>
 				<Nav className="ms-auto">
 					<NavDropdown
