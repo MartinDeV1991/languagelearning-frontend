@@ -22,7 +22,7 @@ export default function WordTable() {
 
 		if (confirmDelete) {
 			selectedRows.forEach((id) => {
-				fetch(`${path}api/word/delete/${id}`, {
+				fetch(`${path}api/word/${id}`, {
 					method: "DELETE",
 				})
 					.then((response) => {
@@ -44,7 +44,7 @@ export default function WordTable() {
 			console.log(data);
 			if (data) {
 				// Send API request with the updated data
-				fetch(`${path}api/word/edit/${rowId}`, {
+				fetch(`${path}api/word/${rowId}`, {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
