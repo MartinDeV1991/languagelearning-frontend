@@ -2,11 +2,40 @@ import { AgGridReact } from "ag-grid-react"; // React Grid Logic
 import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
 import React, { useEffect, useMemo, useState } from "react";
-import { Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 
 export default function WordTable() {
 	const path = `http://localhost:8080/`;
 	const [quickFilterText, setQuickFilterText] = useState("");
+	const [selectedRows, setSelectedRows] = useState([]);
+	const onSelectionChanged = (event) => {
+		const selectedNodes = event.api.getSelectedNodes();
+		const selectedWordIds = selectedNodes.map((node) => node.data.id);
+		setSelectedRows(selectedWordIds);
+	};
+
+	const handleDeleteClick = () => {
+		const confirmDelete = window.confirm(
+			`You are about to delete ${selectedRows.length} word(s) from your list. Are you sure you want to do this?`
+		);
+
+		if (confirmDelete) {
+			selectedRows.forEach((id) => {
+				fetch(`${path}api/word/delete/${id}`, {
+					method: "DELETE",
+				})
+					.then((response) => {
+						if (response.ok) {
+							// Update the grid after successful deletion
+							// You may fetch data again or update the rowData state as needed
+						} else {
+							// Handle error response
+						}
+					})
+					.then(() => fetchWords());
+			});
+		}
+	};
 
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
@@ -56,7 +85,12 @@ export default function WordTable() {
 				values: ["NL", "FR", "ES", "EN-GB"], // options for select
 			},
 		},
-		{ field: "word", filter: "agTextColumnFilter", width: 130 },
+		{
+			field: "word",
+			filter: "agTextColumnFilter",
+			width: 130,
+			checkboxSelection: true,
+		},
 		{ field: "translation", width: 130 },
 		{ field: "contextSentence" },
 
@@ -73,11 +107,15 @@ export default function WordTable() {
 		[]
 	);
 
-	// Fetch data & update rowData state
-	useEffect(() => {
+	function fetchWords() {
 		fetch(`${path}api/word`) // Fetch data from server
 			.then((result) => result.json()) // Convert to JSON
 			.then((rowData) => setRowData(rowData)); // Update state of `rowData`
+	}
+
+	// Fetch data & update rowData state
+	useEffect(() => {
+		fetchWords();
 	}, []);
 
 	return (
@@ -96,8 +134,13 @@ export default function WordTable() {
 					columnDefs={colDefs} // column headings and settings
 					pagination={true} // sorts data into pages
 					quickFilterText={quickFilterText} // filters based on what is inputted in search bar
+					onSelectionChanged={onSelectionChanged} // Event listener
+					rowSelection="multiple" // Enable multiple row selection
 				/>
 			</div>
+			<Button onClick={handleDeleteClick} className="mb-2">
+				Delete Selected
+			</Button>
 		</>
 	);
 }
