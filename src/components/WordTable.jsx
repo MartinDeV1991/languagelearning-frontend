@@ -8,6 +8,7 @@ export default function WordTable() {
 	const path = `http://localhost:8080/`;
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
+
 	const onSelectionChanged = (event) => {
 		const selectedNodes = event.api.getSelectedNodes();
 		const selectedWordIds = selectedNodes.map((node) => node.data.id);
@@ -35,6 +36,42 @@ export default function WordTable() {
 					.then(() => fetchWords());
 			});
 		}
+	};
+
+	const handleEditConfirmation = (rowId, data, confirmEdit) => {
+		if (confirmEdit) {
+			// Send API request to save changes;
+			console.log(data);
+			if (data) {
+				// Send API request with the updated data
+				fetch(`${path}api/word/edit/${rowId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				}).then((response) => {
+					if (response.ok) {
+						fetchWords();
+						// alert confirmation?
+					} else {
+						console.log(response);
+					}
+				});
+			}
+		} else {
+			// can I just revert that one cell instead of refreshing all?
+			fetchWords();
+		}
+	};
+
+	const onCellEditingStopped = (event) => {
+		const { node } = event;
+		const rowId = node.data.id;
+
+		// Display confirmation dialog
+		const confirmEdit = window.confirm("Do you want to save changes?");
+		handleEditConfirmation(rowId, event.node.data, confirmEdit);
 	};
 
 	const handleSearchChange = (event) => {
@@ -95,7 +132,7 @@ export default function WordTable() {
 		{ field: "contextSentence" },
 
 		{ field: "translatedContextSentence" },
-		{ field: "rootWord", valueFormatter: rootWordFormatter },
+		{ field: "rootWord", valueFormatter: rootWordFormatter, editable: false },
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
@@ -135,6 +172,7 @@ export default function WordTable() {
 					pagination={true} // sorts data into pages
 					quickFilterText={quickFilterText} // filters based on what is inputted in search bar
 					onSelectionChanged={onSelectionChanged} // Event listener
+					onCellEditingStopped={onCellEditingStopped} // Event listener when editing stops
 					rowSelection="multiple" // Enable multiple row selection
 				/>
 			</div>
