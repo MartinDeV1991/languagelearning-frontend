@@ -2,11 +2,77 @@ import { AgGridReact } from "ag-grid-react"; // React Grid Logic
 import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
 import React, { useEffect, useMemo, useState } from "react";
-import { Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 
 export default function WordTable() {
 	const path = `http://localhost:8080/`;
 	const [quickFilterText, setQuickFilterText] = useState("");
+	const [selectedRows, setSelectedRows] = useState([]);
+
+	const onSelectionChanged = (event) => {
+		const selectedNodes = event.api.getSelectedNodes();
+		const selectedWordIds = selectedNodes.map((node) => node.data.id);
+		setSelectedRows(selectedWordIds);
+	};
+
+	const handleDeleteClick = () => {
+		const confirmDelete = window.confirm(
+			`You are about to delete ${selectedRows.length} word(s) from your list. Are you sure you want to do this?`
+		);
+
+		if (confirmDelete) {
+			selectedRows.forEach((id) => {
+				fetch(`${path}api/word/delete/${id}`, {
+					method: "DELETE",
+				})
+					.then((response) => {
+						if (response.ok) {
+							// Update the grid after successful deletion
+							// You may fetch data again or update the rowData state as needed
+						} else {
+							// Handle error response
+						}
+					})
+					.then(() => fetchWords());
+			});
+		}
+	};
+
+	const handleEditConfirmation = (rowId, data, confirmEdit) => {
+		if (confirmEdit) {
+			// Send API request to save changes;
+			console.log(data);
+			if (data) {
+				// Send API request with the updated data
+				fetch(`${path}api/word/edit/${rowId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				}).then((response) => {
+					if (response.ok) {
+						fetchWords();
+						// alert confirmation?
+					} else {
+						console.log(response);
+					}
+				});
+			}
+		} else {
+			// can I just revert that one cell instead of refreshing all?
+			fetchWords();
+		}
+	};
+
+	const onCellEditingStopped = (event) => {
+		const { node } = event;
+		const rowId = node.data.id;
+
+		// Display confirmation dialog
+		const confirmEdit = window.confirm("Do you want to save changes?");
+		handleEditConfirmation(rowId, event.node.data, confirmEdit);
+	};
 
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
@@ -56,12 +122,17 @@ export default function WordTable() {
 				values: ["NL", "FR", "ES", "EN-GB"], // options for select
 			},
 		},
-		{ field: "word", filter: "agTextColumnFilter", width: 130 },
+		{
+			field: "word",
+			filter: "agTextColumnFilter",
+			width: 130,
+			checkboxSelection: true,
+		},
 		{ field: "translation", width: 130 },
 		{ field: "contextSentence" },
 
 		{ field: "translatedContextSentence" },
-		{ field: "rootWord", valueFormatter: rootWordFormatter },
+		{ field: "rootWord", valueFormatter: rootWordFormatter, editable: false },
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
@@ -73,11 +144,15 @@ export default function WordTable() {
 		[]
 	);
 
-	// Fetch data & update rowData state
-	useEffect(() => {
+	function fetchWords() {
 		fetch(`${path}api/word`) // Fetch data from server
 			.then((result) => result.json()) // Convert to JSON
 			.then((rowData) => setRowData(rowData)); // Update state of `rowData`
+	}
+
+	// Fetch data & update rowData state
+	useEffect(() => {
+		fetchWords();
 	}, []);
 
 	return (
@@ -96,8 +171,14 @@ export default function WordTable() {
 					columnDefs={colDefs} // column headings and settings
 					pagination={true} // sorts data into pages
 					quickFilterText={quickFilterText} // filters based on what is inputted in search bar
+					onSelectionChanged={onSelectionChanged} // Event listener
+					onCellEditingStopped={onCellEditingStopped} // Event listener when editing stops
+					rowSelection="multiple" // Enable multiple row selection
 				/>
 			</div>
+			<Button onClick={handleDeleteClick} className="mb-2">
+				Delete Selected
+			</Button>
 		</>
 	);
 }
