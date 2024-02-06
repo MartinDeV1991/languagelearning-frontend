@@ -29,6 +29,8 @@ const Quiz = () => {
 
 	const [gameStarted, setGameStarted] = useState(false);
 
+	const [wordIds, setWordIds] = useState([]);
+
 	useEffect(() => {
 		setOutput(questions[currentQuestionIndex]);
 		setInput("");
@@ -58,12 +60,13 @@ const Quiz = () => {
 		fetch(`${process.env.REACT_APP_PATH}api/word/user/${user_id}`)
 			.then((res) => res.json())
 			.then((data) => {
+				console.log("data: ", data)
 				const filteredData = data.filter(item => item.sourceLanguage === language1 && item.translatedTo === language2);
+				setWordIds(filteredData.map(({ id }) => id));
 				setQuestions(filteredData.map(({ word }) => word));
 				setAnswers(filteredData.map(({ translation }) => translation));
 				setSentenceOriginal(filteredData.map(({ contextSentence }) => contextSentence));
 				setSentenceTranslated(filteredData.map(({ translatedContextSentence }) => translatedContextSentence));
-				setOutput("filteredData[0].word");
 				setGameStarted(true);
 			});
 	};
@@ -71,9 +74,10 @@ const Quiz = () => {
 	const checkAnswer = (e) => {
 		e.preventDefault();
 		const userAnswer = input;
-		if (
-			userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()
-		) {
+		let correct = false;
+		const wordId = wordIds[currentQuestionIndex];
+		if (userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()) {
+			correct = true;
 			if (currentQuestionIndex + 1 <= Math.min(questions.length, 10)) {
 				setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
 			} else {
@@ -83,6 +87,13 @@ const Quiz = () => {
 		} else {
 			setFeedback("Incorrect. Try again.");
 		}
+		fetch(`${process.env.REACT_APP_PATH}api/statistics/add_attempts/${wordId}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(correct),
+		})
 	};
 
 	const handleInputChange = (e) => {
