@@ -119,6 +119,7 @@ const Quiz = () => {
 					)}
 
 					<Form onSubmit={checkAnswer}>
+						<div><strong>{language1}</strong> to <strong>{language2}</strong></div>
 						<div>Question: {currentQuestionIndex + 1}</div>
 						<div>Translate: {output}</div>
 						<div style={{ color: "red" }}>{feedback}</div>
