@@ -8,11 +8,37 @@ export default function WordTable() {
 	const path = `http://localhost:8080/`;
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
+	const [originalRowData, setOriginalRowData] = useState([]);
 
 	const onSelectionChanged = (event) => {
 		const selectedNodes = event.api.getSelectedNodes();
 		const selectedWordIds = selectedNodes.map((node) => node.data.id);
 		setSelectedRows(selectedWordIds);
+	};
+
+	const onRowEditingStarted = (event) => {
+		const { data } = event.node;
+		// Make a deep copy of the original row data to preserve it
+		const originalDataCopy = JSON.parse(JSON.stringify(data));
+		setOriginalRowData(originalDataCopy);
+	};
+
+	const onRowEditingStopped = (event) => {
+		const { node } = event;
+		const rowId = node.data.id;
+
+		// Get the edited row data
+		const editedData = node.data;
+
+		// Compare the original row data with the edited row data
+		const hasChanged =
+			JSON.stringify(originalRowData) !== JSON.stringify(editedData);
+
+		if (hasChanged) {
+			// Display confirmation dialog
+			const confirmEdit = window.confirm("Do you want to save changes?");
+			handleEditConfirmation(rowId, editedData, confirmEdit);
+		}
 	};
 
 	const handleDeleteClick = () => {
@@ -65,15 +91,6 @@ export default function WordTable() {
 		}
 	};
 
-	const onCellEditingStopped = (event) => {
-		const { node } = event;
-		const rowId = node.data.id;
-
-		// Display confirmation dialog
-		const confirmEdit = window.confirm("Do you want to save changes?");
-		handleEditConfirmation(rowId, event.node.data, confirmEdit);
-	};
-
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
 		setQuickFilterText(searchText);
@@ -108,6 +125,38 @@ export default function WordTable() {
 		return message;
 	};
 
+	const generateRootWord = (wordID) => {
+		fetch(`${path}api/word/${wordID}/root`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}).then((response) => {
+			if (response.ok) {
+				fetchWords();
+				// alert confirmation?
+			} else {
+				console.log(response);
+			}
+		});
+	};
+
+	const rootWordRenderer = (params) => {
+		const rootWord = params.value;
+		if (rootWord != null) {
+			if (rootWord.partOfSpeech != null) {
+				return `${rootWord.word} (${rootWord.partOfSpeech})`; // custom format, showing part of speech in brackets
+			} else {
+				return `${rootWord.word}`;
+			}
+		}
+		return (
+			<Button onClick={() => generateRootWord(params.data.id)} size="sm">
+				Generate
+			</Button>
+		);
+	};
+
 	// Row Data: The data to be displayed.
 	// Column Definitions: Defines & controls grid columns.
 	const [rowData, setRowData] = useState([]);
@@ -132,7 +181,12 @@ export default function WordTable() {
 		{ field: "contextSentence" },
 
 		{ field: "translatedContextSentence" },
-		{ field: "rootWord", valueFormatter: rootWordFormatter, editable: false },
+		{
+			field: "rootWord",
+			// valueFormatter: rootWordFormatter,
+			editable: false,
+			cellRenderer: rootWordRenderer,
+		},
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
@@ -171,9 +225,11 @@ export default function WordTable() {
 					columnDefs={colDefs} // column headings and settings
 					pagination={true} // sorts data into pages
 					quickFilterText={quickFilterText} // filters based on what is inputted in search bar
-					onSelectionChanged={onSelectionChanged} // Event listener
-					onCellEditingStopped={onCellEditingStopped} // Event listener when editing stops
+					onSelectionChanged={onSelectionChanged} // Event listener when selected rows changes
+					onRowEditingStarted={onRowEditingStarted} // Event listener when editing starts
+					onRowEditingStopped={onRowEditingStopped} // Event listener when editing stops
 					rowSelection="multiple" // Enable multiple row selection
+					editType="fullRow"
 				/>
 			</div>
 			<Button onClick={handleDeleteClick} className="mb-2">
