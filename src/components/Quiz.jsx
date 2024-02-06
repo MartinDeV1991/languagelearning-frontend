@@ -8,6 +8,10 @@ import QuizAnimation from "../components/QuizAnimation";
 const Quiz = () => {
 	let user_id = localStorage.getItem("languagelearning_id");
 
+	const [language1, setLanguage1] = useState('NL');
+	const [language2, setLanguage2] = useState('NL');
+
+
 	const [input, setInput] = useState("");
 	const [output, setOutput] = useState("");
 	const [feedback, setFeedback] = useState("");
@@ -34,17 +38,32 @@ const Quiz = () => {
 		setHint3(false);
 	}, [currentQuestionIndex, questions]);
 
+	const handleLanguage1Change = (event) => {
+		setLanguage1(event.target.value);
+	};
+
+	const handleLanguage2Change = (event) => {
+		setLanguage2(event.target.value);
+	};
+
+	const restartQuiz = () => {
+		setCurrentQuestionIndex(0)
+		setGameStarted(false)
+	}
+
 	const startGame = () => {
+		console.log("Language 1 selected:", language1);
+		console.log("Language 2 selected:", language2);
+
 		fetch(`${process.env.REACT_APP_PATH}api/word/user/${user_id}`)
 			.then((res) => res.json())
 			.then((data) => {
-				setQuestions(data.map((item) => item.word));
-				setAnswers(data.map((item) => item.translation));
-				setSentenceOriginal(data.map((item) => item.contextSentence));
-				setSentenceTranslated(
-					data.map((item) => item.translatedContextSentence)
-				);
-				setOutput(data[0].word);
+				const filteredData = data.filter(item => item.sourceLanguage === language1 && item.translatedTo === language2);
+				setQuestions(filteredData.map(({ word }) => word));
+				setAnswers(filteredData.map(({ translation }) => translation));
+				setSentenceOriginal(filteredData.map(({ contextSentence }) => contextSentence));
+				setSentenceTranslated(filteredData.map(({ translatedContextSentence }) => translatedContextSentence));
+				setOutput("filteredData[0].word");
 				setGameStarted(true);
 			});
 	};
@@ -119,9 +138,26 @@ const Quiz = () => {
 					</Form>
 				</div>
 			)}{" "}
-			{!gameStarted && <Button onClick={startGame}>Start</Button>}
+			{!gameStarted && (
+				<div>
+					<select value={language1} onChange={handleLanguage1Change}>
+						<option value="NL">NL</option>
+						<option value="EN">EN</option>
+						<option value="EN-GB">EN-GB</option>
+						<option value="ES">ES</option>
+					</select>
+
+					<select value={language2} onChange={handleLanguage2Change}>
+						<option value="NL">NL</option>
+						<option value="EN">EN</option>
+						<option value="EN-GB">EN-GB</option>
+						<option value="ES">ES</option>
+					</select>
+
+					<Button onClick={startGame}>Start</Button>
+				</div>)}
 			{currentQuestionIndex > 0 && (
-				<Button onClick={() => setCurrentQuestionIndex(0)}>Restart</Button>
+				<Button onClick={restartQuiz}>Restart</Button>
 			)}
 			<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
 		</Container>
