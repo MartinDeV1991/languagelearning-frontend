@@ -5,7 +5,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 
 export default function WordTable() {
-	const path = `http://localhost:8080/`;
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
 	const [originalRowData, setOriginalRowData] = useState([]);
@@ -48,7 +47,7 @@ export default function WordTable() {
 
 		if (confirmDelete) {
 			selectedRows.forEach((id) => {
-				fetch(`${path}api/word/${id}`, {
+				fetch(`${process.env.REACT_APP_PATH}api/word/${id}`, {
 					method: "DELETE",
 				})
 					.then((response) => {
@@ -70,7 +69,7 @@ export default function WordTable() {
 			console.log(data);
 			if (data) {
 				// Send API request with the updated data
-				fetch(`${path}api/word/${rowId}`, {
+				fetch(`${process.env.REACT_APP_PATH}api/word/${rowId}`, {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
@@ -199,7 +198,7 @@ export default function WordTable() {
 	);
 
 	function fetchWords() {
-		fetch(`${path}api/word`) // Fetch data from server
+		fetch(`${process.env.REACT_APP_PATH}api/word`) // Fetch data from server
 			.then((result) => result.json()) // Convert to JSON
 			.then((rowData) => setRowData(rowData)); // Update state of `rowData`
 	}

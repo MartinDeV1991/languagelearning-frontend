@@ -4,7 +4,6 @@ import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-	const path = `https://language-backend.azurewebsites.net/`;
 
 	const navigate = useNavigate();
 	const [email, setEmail] = useState();
@@ -26,7 +25,7 @@ const Login = () => {
 			password: password,
 		};
 
-		fetch(`${path}api/user/login`, {
+		fetch(`${process.env.REACT_APP_PATH}api/user/login`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

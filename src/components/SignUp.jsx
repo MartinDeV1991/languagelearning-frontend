@@ -3,7 +3,6 @@ import { Container, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
-	const path = `https://language-backend.azurewebsites.net/`;
 
 	const navigate = useNavigate();
 	const [firstName, setFirstName] = useState("");
@@ -38,7 +37,7 @@ const SignUp = () => {
 		};
 
 		console.log(signUpRequest);
-		fetch(`${path}api/user/signup`, {
+		fetch(`${process.env.REACT_APP_PATH}api/user/signup`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

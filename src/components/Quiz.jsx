@@ -6,10 +6,11 @@ import "./quiz.css";
 import QuizAnimation from "../components/QuizAnimation";
 
 const Quiz = () => {
-    const path = `https://language-backend.azurewebsites.net/`;
-    // const path = `http://localhost:8080/`;
-
 	let user_id = localStorage.getItem("languagelearning_id");
+
+	const [language1, setLanguage1] = useState('NL');
+	const [language2, setLanguage2] = useState('NL');
+
 
 	const [input, setInput] = useState("");
 	const [output, setOutput] = useState("");
@@ -28,6 +29,8 @@ const Quiz = () => {
 
 	const [gameStarted, setGameStarted] = useState(false);
 
+	const [wordIds, setWordIds] = useState([]);
+
 	useEffect(() => {
 		setOutput(questions[currentQuestionIndex]);
 		setInput("");
@@ -37,17 +40,33 @@ const Quiz = () => {
 		setHint3(false);
 	}, [currentQuestionIndex, questions]);
 
+	const handleLanguage1Change = (event) => {
+		setLanguage1(event.target.value);
+	};
+
+	const handleLanguage2Change = (event) => {
+		setLanguage2(event.target.value);
+	};
+
+	const restartQuiz = () => {
+		setCurrentQuestionIndex(0)
+		setGameStarted(false)
+	}
+
 	const startGame = () => {
-		fetch(`${path}api/word/user/${user_id}`)
+		console.log("Language 1 selected:", language1);
+		console.log("Language 2 selected:", language2);
+
+		fetch(`${process.env.REACT_APP_PATH}api/word/user/${user_id}`)
 			.then((res) => res.json())
 			.then((data) => {
-				setQuestions(data.map((item) => item.word));
-				setAnswers(data.map((item) => item.translation));
-				setSentenceOriginal(data.map((item) => item.contextSentence));
-				setSentenceTranslated(
-					data.map((item) => item.translatedContextSentence)
-				);
-				setOutput(data[0].word);
+				console.log("data: ", data)
+				const filteredData = data.filter(item => item.sourceLanguage === language1 && item.translatedTo === language2);
+				setWordIds(filteredData.map(({ id }) => id));
+				setQuestions(filteredData.map(({ word }) => word));
+				setAnswers(filteredData.map(({ translation }) => translation));
+				setSentenceOriginal(filteredData.map(({ contextSentence }) => contextSentence));
+				setSentenceTranslated(filteredData.map(({ translatedContextSentence }) => translatedContextSentence));
 				setGameStarted(true);
 			});
 	};
@@ -55,9 +74,10 @@ const Quiz = () => {
 	const checkAnswer = (e) => {
 		e.preventDefault();
 		const userAnswer = input;
-		if (
-			userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()
-		) {
+		let correct = false;
+		const wordId = wordIds[currentQuestionIndex];
+		if (userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()) {
+			correct = true;
 			if (currentQuestionIndex + 1 <= Math.min(questions.length, 10)) {
 				setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
 			} else {
@@ -67,6 +87,13 @@ const Quiz = () => {
 		} else {
 			setFeedback("Incorrect. Try again.");
 		}
+		fetch(`${process.env.REACT_APP_PATH}api/statistics/add_attempts/${wordId}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(correct),
+		})
 	};
 
 	const handleInputChange = (e) => {
@@ -103,6 +130,7 @@ const Quiz = () => {
 					)}
 
 					<Form onSubmit={checkAnswer}>
+						<div><strong>{language1}</strong> to <strong>{language2}</strong></div>
 						<div>Question: {currentQuestionIndex + 1}</div>
 						<div>Translate: {output}</div>
 						<div style={{ color: "red" }}>{feedback}</div>
@@ -122,9 +150,26 @@ const Quiz = () => {
 					</Form>
 				</div>
 			)}{" "}
-			{!gameStarted && <Button onClick={startGame}>Start</Button>}
+			{!gameStarted && (
+				<div>
+					<select value={language1} onChange={handleLanguage1Change}>
+						<option value="NL">NL</option>
+						<option value="EN">EN</option>
+						<option value="EN-GB">EN-GB</option>
+						<option value="ES">ES</option>
+					</select>
+
+					<select value={language2} onChange={handleLanguage2Change}>
+						<option value="NL">NL</option>
+						<option value="EN">EN</option>
+						<option value="EN-GB">EN-GB</option>
+						<option value="ES">ES</option>
+					</select>
+
+					<Button onClick={startGame}>Start</Button>
+				</div>)}
 			{currentQuestionIndex > 0 && (
-				<Button onClick={() => setCurrentQuestionIndex(0)}>Restart</Button>
+				<Button onClick={restartQuiz}>Restart</Button>
 			)}
 			<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
 		</Container>
