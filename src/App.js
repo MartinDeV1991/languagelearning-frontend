@@ -22,6 +22,7 @@ function App() {
 				<Route path="/quiz" element={<QuizPage />} />
 				<Route path="/words" element={<WordListPage />} />
 			</Routes>
+			<Footer />
 		</>
 	);
 }
