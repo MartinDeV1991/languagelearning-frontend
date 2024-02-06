@@ -6,9 +6,6 @@ import "./quiz.css";
 import QuizAnimation from "../components/QuizAnimation";
 
 const Quiz = () => {
-    const path = `https://language-backend.azurewebsites.net/`;
-    // const path = `http://localhost:8080/`;
-
 	let user_id = localStorage.getItem("languagelearning_id");
 
 	const [input, setInput] = useState("");
@@ -38,7 +35,7 @@ const Quiz = () => {
 	}, [currentQuestionIndex, questions]);
 
 	const startGame = () => {
-		fetch(`${path}api/word/user/${user_id}`)
+		fetch(`${process.env.REACT_APP_PATH}api/word/user/${user_id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				setQuestions(data.map((item) => item.word));
