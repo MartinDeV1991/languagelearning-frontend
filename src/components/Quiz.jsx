@@ -86,6 +86,8 @@ const Quiz = () => {
 								(!b.statistics) ? 1 :
 									a.statistics.attempts - b.statistics.attempts;
 					});
+				} else if (quizType === "flagged") {
+					filteredData = languageFilteredData.filter(item => item.statistics.flag);
 				} else {
 					filteredData = languageFilteredData;
 					filteredData.sort(function () { return Math.random() })
