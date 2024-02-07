@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { postData } from "utils/api";
 
 const Login = () => {
-
 	const navigate = useNavigate();
 	const [email, setEmail] = useState();
 	const [password, setPassword] = useState();
@@ -17,44 +17,35 @@ const Login = () => {
 		setPassword(e.target.value);
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 
 		const loginRequest = {
 			email: email,
 			password: password,
 		};
-
-		fetch(`${process.env.REACT_APP_PATH}api/user/login`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(loginRequest),
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				console.log(data);
-				console.log("succesvol ingelogd");
-				console.log(data.success);
-				if (data.status !== 404) {
-					localStorage.setItem("languagelearning_token", data.token);
-					localStorage.setItem("languagelearning_first_name", data.firstName);
-					localStorage.setItem("languagelearning_last_name", data.lastName);
-					localStorage.setItem("languagelearning_id", data.id);
-					navigate(`/`);
-				} else {
-					localStorage.setItem("languagelearning_id", "1");
-					localStorage.setItem("languagelearning_first_name", "User");
-					navigate(`/`);
-				}
-			})
-			.catch((error) => {
-				console.error("Error:", error);
+		try {
+			const data = await postData("api/user/login", loginRequest);
+			console.log(data);
+			console.log("succesvol ingelogd");
+			console.log(data.success);
+			if (data.status !== 404) {
+				localStorage.setItem("languagelearning_token", data.token);
+				localStorage.setItem("languagelearning_first_name", data.firstName);
+				localStorage.setItem("languagelearning_last_name", data.lastName);
+				localStorage.setItem("languagelearning_id", data.id);
+				navigate(`/`);
+			} else {
 				localStorage.setItem("languagelearning_id", "1");
 				localStorage.setItem("languagelearning_first_name", "User");
 				navigate(`/`);
-			});
+			}
+		} catch (error) {
+			console.error("Error:", error);
+			localStorage.setItem("languagelearning_id", "1");
+			localStorage.setItem("languagelearning_first_name", "User");
+			navigate(`/`);
+		}
 	};
 
 	return (
