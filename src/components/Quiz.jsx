@@ -77,8 +77,7 @@ const Quiz = () => {
 					filteredData = languageFilteredData.filter(item => (item.statistics?.attempts !== undefined && item.statistics.attempts > 0) ?
 						(item.statistics.guessedCorrectly / item.statistics.attempts < 1) :
 						false)
-					// filteredData = languageFilteredData.filter(item => console.log("stats:", item.statistics))
-					filteredData.sort(function () { return Math.random() })
+					filteredData.sort(() => Math.random() - 0.5)
 				} else if (quizType === "least_attempts") {
 					filteredData = languageFilteredData.sort((a, b) => {
 						return (!a.statistics && !b.statistics) ? 0 :
@@ -87,13 +86,13 @@ const Quiz = () => {
 									a.statistics.attempts - b.statistics.attempts;
 					});
 				} else if (quizType === "flagged") {
-					filteredData = languageFilteredData.filter(item => item.statistics.flag);
+					filteredData = languageFilteredData.filter(item => item.statistics?.flag);
+					filteredData.sort(() => Math.random() - 0.5)
 				} else {
 					filteredData = languageFilteredData;
-					filteredData.sort(function () { return Math.random() })
+					filteredData.sort(() => Math.random() - 0.5)
 				}
 
-				console.log("data: ", filteredData)
 				setWordIds(filteredData.map(({ id }) => id));
 				setQuestions(filteredData.map(({ word }) => word));
 				setAnswers(filteredData.map(({ translation }) => translation));

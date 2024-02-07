@@ -37,10 +37,27 @@ export default function WordTable() {
 		}
 	};
 
-	const handleEditConfirmation = (rowId, data, confirmEdit) => {
+	const handleEditConfirmation = (rowId, data, column, confirmEdit) => {
 		if (confirmEdit) {
 			// Send API request to save changes;
 			console.log(data);
+			console.log("flag: ", data.statistics.flag)
+			if (column == "statistics.flag") {
+				fetch(`${process.env.REACT_APP_PATH}api/statistics/flag/${rowId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data.statistics.flag),
+				}).then((response) => {
+					if (response.ok) {
+						fetchWords();
+						// alert confirmation?
+					} else {
+						console.log("response: ", response);
+					}
+				});
+			}
 			if (data) {
 				// Send API request with the updated data
 				fetch(`${process.env.REACT_APP_PATH}api/word/${rowId}`, {
@@ -54,7 +71,7 @@ export default function WordTable() {
 						fetchWords();
 						// alert confirmation?
 					} else {
-						console.log(response);
+						console.log("response: ", response);
 					}
 				});
 			}
@@ -70,7 +87,7 @@ export default function WordTable() {
 
 		// Display confirmation dialog
 		const confirmEdit = window.confirm("Do you want to save changes?");
-		handleEditConfirmation(rowId, event.node.data, confirmEdit);
+		handleEditConfirmation(rowId, event.node.data, event.column.colDef.field, confirmEdit);
 	};
 
 	const handleSearchChange = (event) => {
@@ -132,6 +149,7 @@ export default function WordTable() {
 
 		{ field: "translatedContextSentence" },
 		{ field: "rootWord", valueFormatter: rootWordFormatter, editable: false },
+		{ field: "statistics.flag" }
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
