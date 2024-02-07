@@ -88,7 +88,6 @@ export default function WordTable() {
 		}
 	};
 
-  
 	const handleEditConfirmation = async (rowId, data, confirmEdit) => {
 		if (confirmEdit && data) {
 			try {
@@ -110,26 +109,20 @@ export default function WordTable() {
 		}
 	};
 
-	const handleCellValueChanged = (event) => {
+	const handleCellValueChanged = async (event) => {
 		const rowId = event.data.id;
 		const flag = event.value;
-		if (event.colDef.field == "statistics.flag") {
-			fetch(`${process.env.REACT_APP_PATH}api/statistics/flag/${rowId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(flag),
-			}).then((response) => {
-				if (response.ok) {
-					fetchWords();
-					// alert confirmation?
-				} else {
-					console.log("response: ", response);
-				}
-			});
+		console.log(event);
+		if (event.colDef.field === "statistics.flag") {
+			try {
+				await putData(`/api/statistics/flag/${rowId}`, flag);
+			} catch (error) {
+				console.log(error);
+				toast.error("Couldn't save, please try again.");
+				// reset checkbox back to old value
+			}
 		}
-	}
+	};
 
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
@@ -166,7 +159,7 @@ export default function WordTable() {
 			editable: false,
 			cellRenderer: RootWordOffCanvas,
 		},
-		{ field: "statistics.flag" }
+		{ field: "statistics.flag" },
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
@@ -207,18 +200,6 @@ export default function WordTable() {
 			<Button onClick={handleDeleteClick} className="mb-2">
 				Delete Selected
 			</Button>
-			<ToastContainer
-				position="top-right"
-				autoClose={5000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover={false}
-				theme="light"
-			/>
 		</>
 	);
 }

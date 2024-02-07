@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { postData } from "utils/api";
 
 const SignUp = () => {
-
 	const navigate = useNavigate();
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
@@ -26,7 +26,7 @@ const SignUp = () => {
 		setPassword(e.target.value);
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 
 		const signUpRequest = {
@@ -37,23 +37,14 @@ const SignUp = () => {
 		};
 
 		console.log(signUpRequest);
-		fetch(`${process.env.REACT_APP_PATH}api/user/signup`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(signUpRequest),
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				if (data.success) {
-					console.log("User added to the database");
-				}
-				navigate(`/login`);
-			})
-			.catch((error) => {
-				console.error("Error:", error);
-			});
+
+		try {
+			await postData("api/user/signup", signUpRequest);
+			console.log("User added to the database");
+			navigate(`/login`);
+		} catch (error) {
+			console.error("Error:", error);
+		}
 	};
 
 	return (
