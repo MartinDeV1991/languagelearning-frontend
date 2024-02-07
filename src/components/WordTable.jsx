@@ -47,7 +47,6 @@ export default function WordTable() {
 
 		// Get the edited row data
 		const editedData = node.data;
-
 		// Compare the original row data with the edited row data
 		const hasChanged =
 			JSON.stringify(originalRowData) !== JSON.stringify(editedData);
@@ -89,6 +88,7 @@ export default function WordTable() {
 		}
 	};
 
+  
 	const handleEditConfirmation = async (rowId, data, confirmEdit) => {
 		if (confirmEdit && data) {
 			try {
@@ -109,6 +109,27 @@ export default function WordTable() {
 			gridRef.current.api.applyTransaction({ update: [originalRowData] });
 		}
 	};
+
+	const handleCellValueChanged = (event) => {
+		const rowId = event.data.id;
+		const flag = event.value;
+		if (event.colDef.field == "statistics.flag") {
+			fetch(`${process.env.REACT_APP_PATH}api/statistics/flag/${rowId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(flag),
+			}).then((response) => {
+				if (response.ok) {
+					fetchWords();
+					// alert confirmation?
+				} else {
+					console.log("response: ", response);
+				}
+			});
+		}
+	}
 
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
@@ -145,6 +166,7 @@ export default function WordTable() {
 			editable: false,
 			cellRenderer: RootWordOffCanvas,
 		},
+		{ field: "statistics.flag" }
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
@@ -176,6 +198,7 @@ export default function WordTable() {
 					onSelectionChanged={onSelectionChanged} // Event listener when selected rows changes
 					onRowEditingStarted={onRowEditingStarted} // Event listener when editing starts
 					onRowEditingStopped={onRowEditingStopped} // Event listener when editing stops
+					onCellValueChanged={handleCellValueChanged} // Event listener for change of flagging words
 					rowSelection="multiple" // Enable multiple row selection
 					getRowId={getRowId} // so ID matches id in data
 					editType="fullRow"
