@@ -10,6 +10,7 @@ import {
 	WordListPage,
 } from "./pages";
 import TopNav from "partials/TopNav";
+import Footer from "partials/Footer";
 
 function App() {
 	return (
