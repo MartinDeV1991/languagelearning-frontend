@@ -6,6 +6,7 @@ import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import RootWordOffCanvas from "./RootWordOffCanvas";
 import { deleteData, fetchData, putData } from "utils/api";
+import { flagFormatter } from "utils/formatter";
 
 export default function WordTable() {
 	const gridRef = React.useRef(null);
@@ -112,21 +113,6 @@ export default function WordTable() {
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
 		setQuickFilterText(searchText);
-	};
-
-	const flagFormatter = (params) => {
-		if (params.value != null) {
-			// if null, don't return anything
-			if (params.value === "EN-GB") {
-				// this doesn't return the right flag so it's hard coded
-				return "🇬🇧";
-			}
-			const codePoints = params.value
-				.toUpperCase()
-				.split("")
-				.map((char) => 127397 + char.charCodeAt());
-			return String.fromCodePoint(...codePoints);
-		}
 	};
 
 	// To do: make this into full component with off canvas to see root word details, and button to fetch root word if not yet present
