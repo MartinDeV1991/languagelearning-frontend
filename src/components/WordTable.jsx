@@ -28,7 +28,6 @@ export default function WordTable() {
 
 		// Get the edited row data
 		const editedData = node.data;
-
 		// Compare the original row data with the edited row data
 		const hasChanged =
 			JSON.stringify(originalRowData) !== JSON.stringify(editedData);
@@ -63,27 +62,10 @@ export default function WordTable() {
 		}
 	};
 
-	const handleEditConfirmation = (rowId, data, column, confirmEdit) => {
+	const handleEditConfirmation = (rowId, data, confirmEdit) => {
 		if (confirmEdit) {
 			// Send API request to save changes;
 			console.log(data);
-			console.log("flag: ", data.statistics.flag)
-			if (column == "statistics.flag") {
-				fetch(`${process.env.REACT_APP_PATH}api/statistics/flag/${rowId}`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(data.statistics.flag),
-				}).then((response) => {
-					if (response.ok) {
-						fetchWords();
-						// alert confirmation?
-					} else {
-						console.log("response: ", response);
-					}
-				});
-			}
 			if (data) {
 				// Send API request with the updated data
 				fetch(`${process.env.REACT_APP_PATH}api/word/${rowId}`, {
@@ -97,7 +79,7 @@ export default function WordTable() {
 						fetchWords();
 						// alert confirmation?
 					} else {
-						console.log("response: ", response);
+						console.log(response);
 					}
 				});
 			}
@@ -107,19 +89,32 @@ export default function WordTable() {
 		}
 	};
 
-	const onCellEditingStopped = (event) => {
-		const { node } = event;
-		const rowId = node.data.id;
-
-		// Display confirmation dialog
-		const confirmEdit = window.confirm("Do you want to save changes?");
-		handleEditConfirmation(rowId, event.node.data, confirmEdit);
-	};
+	const handleCellValueChanged = (event) => {
+		const rowId = event.data.id;
+		const flag = event.value;
+		if (event.colDef.field == "statistics.flag") {
+			fetch(`${process.env.REACT_APP_PATH}api/statistics/flag/${rowId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(flag),
+			}).then((response) => {
+				if (response.ok) {
+					fetchWords();
+					// alert confirmation?
+				} else {
+					console.log("response: ", response);
+				}
+			});
+		}
+	}
 
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
 		setQuickFilterText(searchText);
 	};
+
 
 	const flagFormatter = (params) => {
 		if (params.value != null) {
@@ -151,7 +146,7 @@ export default function WordTable() {
 	};
 
 	const generateRootWord = (wordID) => {
-		fetch(`${path}api/word/${wordID}/root`, {
+		fetch(`${process.env.REACT_APP_PATH}api/word/${wordID}/root`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
@@ -254,6 +249,7 @@ export default function WordTable() {
 					onSelectionChanged={onSelectionChanged} // Event listener when selected rows changes
 					onRowEditingStarted={onRowEditingStarted} // Event listener when editing starts
 					onRowEditingStopped={onRowEditingStopped} // Event listener when editing stops
+					onCellValueChanged={handleCellValueChanged} // Event listener for change of flagging words
 					rowSelection="multiple" // Enable multiple row selection
 					editType="fullRow"
 				/>
