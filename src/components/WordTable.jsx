@@ -115,7 +115,7 @@ export default function WordTable() {
 		console.log(event);
 		if (event.colDef.field === "statistics.flag") {
 			try {
-				await putData(`/api/statistics/flag/${rowId}`, flag);
+				await putData(`api/statistics/flag/${rowId}`, flag);
 			} catch (error) {
 				console.log(error);
 				toast.error("Couldn't save, please try again.");
