@@ -11,6 +11,7 @@ import {
 } from "./pages";
 import TopNav from "partials/TopNav";
 import Footer from "partials/Footer";
+import { ToastContainer } from "react-toastify";
 
 function App() {
 	return (
@@ -23,6 +24,18 @@ function App() {
 				<Route path="/quiz" element={<QuizPage />} />
 				<Route path="/words" element={<WordListPage />} />
 			</Routes>
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover={false}
+				theme="light"
+			/>
 			<Footer />
 		</>
 	);

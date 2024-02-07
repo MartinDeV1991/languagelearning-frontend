@@ -207,18 +207,6 @@ export default function WordTable() {
 			<Button onClick={handleDeleteClick} className="mb-2">
 				Delete Selected
 			</Button>
-			<ToastContainer
-				position="top-right"
-				autoClose={5000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover={false}
-				theme="light"
-			/>
 		</>
 	);
 }
