@@ -1,8 +1,7 @@
 import { toast } from "react-toastify";
 
 // Define API base URL
-const BASE_URL = "http://localhost:8080";
-// const BASE_URL = "https://language-backend.azurewebsites.net/";
+const BASE_URL = process.env.REACT_APP_PATH;
 
 // Common headers, if any, can be defined here
 const headers = {
@@ -19,7 +18,9 @@ export const fetchData = async (endpoint) => {
 		const json = await response.json();
 		return json;
 	} catch (error) {
-		toast.error("There was an error fetching data. Please refresh the page.");
+		toast.error(
+			"There was an error fetching data. Please refresh the page and try again."
+		);
 		console.error("There was a problem with your fetch operation:", error);
 	}
 };
@@ -43,6 +44,7 @@ export const postData = async (endpoint, data) => {
 
 // PUT requests (throws errors that need to be handled)
 export const putData = async (endpoint, data = null) => {
+	console.log(endpoint, "data= " + data);
 	try {
 		const fetchOptions = {
 			method: "PUT",
