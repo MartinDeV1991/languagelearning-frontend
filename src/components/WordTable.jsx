@@ -3,11 +3,30 @@ import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
+import RootWordOffCanvas from "./RootWordOffCanvas";
+import { deleteData, fetchData, putData } from "utils/api";
+import { flagFormatter } from "utils/formatter";
 
 export default function WordTable() {
+	const gridRef = React.useRef(null);
+	let user_id = localStorage.getItem("languagelearning_id");
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
 	const [originalRowData, setOriginalRowData] = useState([]);
+
+	async function fetchWords() {
+		const rowData = await fetchData(`api/word/user/${user_id}`);
+		// const rowData = await fetchData(`api/word`);
+		setRowData(await rowData); // Update state of `rowData` to the fetched data
+	}
+
+	// Fetch data & update rowData state
+	useEffect(() => {
+		fetchWords();
+	}, []);
+
+	const getRowId = (params) => params.data.id;
 
 	const onSelectionChanged = (event) => {
 		const selectedNodes = event.api.getSelectedNodes();
@@ -39,53 +58,55 @@ export default function WordTable() {
 		}
 	};
 
-	const handleDeleteClick = () => {
+	const handleDeleteClick = async () => {
 		const confirmDelete = window.confirm(
 			`You are about to delete ${selectedRows.length} word(s) from your list. Are you sure you want to do this?`
 		);
 
 		if (confirmDelete) {
-			selectedRows.forEach((id) => {
-				fetch(`${process.env.REACT_APP_PATH}api/word/${id}`, {
-					method: "DELETE",
-				})
-					.then((response) => {
-						if (response.ok) {
-							// Update the grid after successful deletion
-							// You may fetch data again or update the rowData state as needed
-						} else {
-							// Handle error response
-						}
-					})
-					.then(() => fetchWords());
+			const promiseToast = toast.promise(deleteData(`api/word`, selectedRows), {
+				pending: "Deleting...",
+				success: "Words successfully deleted.",
+				error: "Some delete requests failed. Please try again.",
 			});
+
+			try {
+				const responses = await promiseToast;
+
+				const allSucceeded = responses.every((response) => response.ok);
+				if (allSucceeded) {
+					// Directly remove the rows from the grid using the row ID
+					const rowsToRemove = selectedRows
+						.map((id) => gridRef.current.api.getRowNode(id))
+						.filter((node) => node)
+						.map((node) => node.data);
+					gridRef.current.api.applyTransaction({ remove: rowsToRemove });
+				}
+			} catch (error) {
+				console.error("Error deleting words:", error);
+			}
 		}
 	};
 
-	const handleEditConfirmation = (rowId, data, confirmEdit) => {
-		if (confirmEdit) {
-			// Send API request to save changes;
-			console.log(data);
-			if (data) {
-				// Send API request with the updated data
-				fetch(`${process.env.REACT_APP_PATH}api/word/${rowId}`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(data),
-				}).then((response) => {
-					if (response.ok) {
-						fetchWords();
-						// alert confirmation?
-					} else {
-						console.log(response);
+  
+	const handleEditConfirmation = async (rowId, data, confirmEdit) => {
+		if (confirmEdit && data) {
+			try {
+				const updatedData = await toast.promise(
+					putData(`api/word/${rowId}`, data),
+					{
+						pending: "Updating...",
+						success: "Word successfully edited.",
+						error: "Changes not saved. Please try again.",
 					}
-				});
+				);
+				gridRef.current.api.applyTransaction({ update: [updatedData] }); //
+			} catch (error) {
+				console.error("Error editing word:", error);
+				gridRef.current.api.refreshCells();
 			}
 		} else {
-			// can I just revert that one cell instead of refreshing all?
-			fetchWords();
+			gridRef.current.api.applyTransaction({ update: [originalRowData] });
 		}
 	};
 
@@ -115,72 +136,10 @@ export default function WordTable() {
 		setQuickFilterText(searchText);
 	};
 
-
-	const flagFormatter = (params) => {
-		if (params.value != null) {
-			// if null, don't return anything
-			if (params.value === "EN-GB") {
-				// this doesn't return the right flag so it's hard coded
-				return "🇬🇧";
-			}
-			const codePoints = params.value
-				.toUpperCase()
-				.split("")
-				.map((char) => 127397 + char.charCodeAt());
-			return String.fromCodePoint(...codePoints);
-		}
-	};
-
-	// To do: make this into full component with off canvas to see root word details, and button to fetch root word if not yet present
-	const rootWordFormatter = (params) => {
-		const rootWord = params.value;
-		let message = "";
-		if (rootWord != null) {
-			if (rootWord.partOfSpeech != null) {
-				message = `${rootWord.word} (${rootWord.partOfSpeech})`; // custom format, showing part of speech in brackets
-			} else {
-				message = `${rootWord.word}`;
-			}
-		}
-		return message;
-	};
-
-	const generateRootWord = (wordID) => {
-		fetch(`${process.env.REACT_APP_PATH}api/word/${wordID}/root`, {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}).then((response) => {
-			if (response.ok) {
-				fetchWords();
-				// alert confirmation?
-			} else {
-				console.log(response);
-			}
-		});
-	};
-
-	const rootWordRenderer = (params) => {
-		const rootWord = params.value;
-		if (rootWord != null) {
-			if (rootWord.partOfSpeech != null) {
-				return `${rootWord.word} (${rootWord.partOfSpeech})`; // custom format, showing part of speech in brackets
-			} else {
-				return `${rootWord.word}`;
-			}
-		}
-		return (
-			<Button onClick={() => generateRootWord(params.data.id)} size="sm">
-				Generate
-			</Button>
-		);
-	};
-
 	// Row Data: The data to be displayed.
 	// Column Definitions: Defines & controls grid columns.
 	const [rowData, setRowData] = useState([]);
-	const [colDefs, setColDefs] = useState([
+	const [colDefs] = useState([
 		{
 			field: "sourceLanguage", // matches the name in data from api
 			headerName: "📖", // custom header name
@@ -203,9 +162,9 @@ export default function WordTable() {
 		{ field: "translatedContextSentence" },
 		{
 			field: "rootWord",
-			// valueFormatter: rootWordFormatter,
+			valueFormatter: null,
 			editable: false,
-			cellRenderer: rootWordRenderer,
+			cellRenderer: RootWordOffCanvas,
 		},
 		{ field: "statistics.flag" }
 	]);
@@ -219,17 +178,6 @@ export default function WordTable() {
 		[]
 	);
 
-	function fetchWords() {
-		fetch(`${process.env.REACT_APP_PATH}api/word`) // Fetch data from server
-			.then((result) => result.json()) // Convert to JSON
-			.then((rowData) => setRowData(rowData)); // Update state of `rowData`
-	}
-
-	// Fetch data & update rowData state
-	useEffect(() => {
-		fetchWords();
-	}, []);
-
 	return (
 		<>
 			<Form.Control
@@ -241,6 +189,7 @@ export default function WordTable() {
 			/>
 			<div className={"ag-theme-quartz"} style={{ width: "100%", height: 600 }}>
 				<AgGridReact
+					ref={gridRef}
 					rowData={rowData} // data from api call
 					defaultColDef={defaultColDef} // default column settings
 					columnDefs={colDefs} // column headings and settings
@@ -251,12 +200,25 @@ export default function WordTable() {
 					onRowEditingStopped={onRowEditingStopped} // Event listener when editing stops
 					onCellValueChanged={handleCellValueChanged} // Event listener for change of flagging words
 					rowSelection="multiple" // Enable multiple row selection
+					getRowId={getRowId} // so ID matches id in data
 					editType="fullRow"
 				/>
 			</div>
 			<Button onClick={handleDeleteClick} className="mb-2">
 				Delete Selected
 			</Button>
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover={false}
+				theme="light"
+			/>
 		</>
 	);
 }

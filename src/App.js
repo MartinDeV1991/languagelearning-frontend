@@ -10,6 +10,7 @@ import {
 	WordListPage,
 } from "./pages";
 import TopNav from "partials/TopNav";
+import Footer from "partials/Footer";
 
 function App() {
 	return (
@@ -22,6 +23,7 @@ function App() {
 				<Route path="/quiz" element={<QuizPage />} />
 				<Route path="/words" element={<WordListPage />} />
 			</Routes>
+			<Footer />
 		</>
 	);
 }
