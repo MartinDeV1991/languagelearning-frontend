@@ -115,52 +115,6 @@ export default function WordTable() {
 		setQuickFilterText(searchText);
 	};
 
-	// To do: make this into full component with off canvas to see root word details, and button to fetch root word if not yet present
-	const rootWordFormatter = (params) => {
-		const rootWord = params.value;
-		let message = "";
-		if (rootWord != null) {
-			if (rootWord.partOfSpeech != null) {
-				message = `${rootWord.word} (${rootWord.partOfSpeech})`; // custom format, showing part of speech in brackets
-			} else {
-				message = `${rootWord.word}`;
-			}
-		}
-		return message;
-	};
-
-	const generateRootWord = (wordID) => {
-		fetch(`${path}api/word/${wordID}/root`, {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}).then((response) => {
-			if (response.ok) {
-				fetchWords();
-				// alert confirmation?
-			} else {
-				console.log(response);
-			}
-		});
-	};
-
-	const rootWordRenderer = (params) => {
-		const rootWord = params.value;
-		if (rootWord != null) {
-			if (rootWord.partOfSpeech != null) {
-				return `${rootWord.word} (${rootWord.partOfSpeech})`; // custom format, showing part of speech in brackets
-			} else {
-				return `${rootWord.word}`;
-			}
-		}
-		return (
-			<Button onClick={() => generateRootWord(params.data.id)} size="sm">
-				Generate
-			</Button>
-		);
-	};
-
 	// Row Data: The data to be displayed.
 	// Column Definitions: Defines & controls grid columns.
 	const [rowData, setRowData] = useState([]);
