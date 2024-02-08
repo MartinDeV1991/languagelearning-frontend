@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Offcanvas } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { deleteData, putData } from "utils/api";
+import { deleteOne, putData } from "utils/api";
 
 export default function RootWordOffCanvas(params) {
 	const [rootWord, setRootWord] = useState(params.value);
@@ -28,7 +28,7 @@ export default function RootWordOffCanvas(params) {
 
 	const deleteRootWord = async (rootWordID) => {
 		try {
-			const responses = await deleteData("api/root-word", [rootWordID]);
+			const responses = await deleteOne("api/root-word", rootWordID);
 			if (responses[0].ok) {
 				setShow(false);
 				setRootWord(null);
