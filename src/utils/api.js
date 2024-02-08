@@ -62,25 +62,46 @@ export const putData = async (endpoint, data = null) => {
 			console.log(response);
 			throw new Error("Network response was not ok: " + response.status);
 		}
-		return await response.json();
+		return response.json();
 	} catch (error) {
 		console.error("There was a problem with your put operation:", error);
 		throw error;
 	}
 };
 
-// DELETE requests (give array of ids)
-export const deleteData = async (endpoint, arrayOfIds) => {
+// DELETE requests (one id)
+export const deleteOne = async (endpoint, id) => {
 	try {
-		const responses = Promise.all(
-			arrayOfIds.map((id) =>
-				fetch(`${BASE_URL}/${endpoint}/${id}`, {
-					method: "DELETE",
-					headers,
-				})
-			)
-		);
-		return await responses;
+		const response = await fetch(`${BASE_URL}/${endpoint}/${id}`, {
+			method: "DELETE",
+			headers,
+		});
+
+		if (!response.ok) {
+			console.log(response);
+			throw new Error("Network response was not ok: " + response.status);
+		}
+		return response.json();
+	} catch (error) {
+		console.error("There was a problem with your delete operation:", error);
+		throw error;
+	}
+};
+
+// DELETE requests (give array of ids)
+export const deleteMultiple = async (endpoint, arrayOfIds) => {
+	try {
+		const response = await fetch(`${BASE_URL}/${endpoint}`, {
+			method: "DELETE",
+			headers,
+			body: JSON.stringify(arrayOfIds),
+		});
+
+		if (!response.ok) {
+			console.log(response);
+			throw new Error("Network response was not ok: " + response.status);
+		}
+		return response.json();
 	} catch (error) {
 		console.error("There was a problem with your delete operation:", error);
 		throw error;

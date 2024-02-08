@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { AgGridReact } from "ag-grid-react"; // React Grid Logic
 import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
 
-import { ToastContainer, toast } from "react-toastify";
-import { deleteData, fetchData, putData } from "utils/api";
+import { toast } from "react-toastify";
+import { fetchData, putData } from "utils/api";
 
 const Statistics = () => {
 
