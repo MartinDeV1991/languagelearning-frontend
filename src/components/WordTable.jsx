@@ -106,26 +106,50 @@ export default function WordTable() {
 		);
 
 		if (confirmDelete) {
-			const promiseToast = toast.promise(deleteData(`api/word`, selectedRows), {
+			let deletePromise;
+			let successMessage;
+			let errorMessage;
+
+			if (selectedRows.length === 1) {
+				deletePromise = deleteOne(`api/word`, selectedRows[0]);
+				successMessage = "Word successfully deleted.";
+				errorMessage = "Delete request failed. Please try again.";
+			} else {
+				deletePromise = deleteMultiple(`api/word`, selectedRows);
+				successMessage = "Words successfully deleted.";
+				errorMessage = "Some delete requests failed. Please try again.";
+			}
+
+			const toastOptions = {
 				pending: "Deleting...",
-				success: "Words successfully deleted.",
-				error: "Some delete requests failed. Please try again.",
-			});
+				success: successMessage,
+				error: errorMessage,
+			};
+
+			const promiseToast = toast.promise(deletePromise, toastOptions);
 
 			try {
-				const responses = await promiseToast;
+				const deletedRows = await promiseToast;
+				console.log(deletedRows);
 
-				const allSucceeded = responses.every((response) => response.ok);
-				if (allSucceeded) {
-					// Directly remove the rows from the grid using the row ID
-					const rowsToRemove = selectedRows
-						.map((id) => gridRef.current.api.getRowNode(id))
+				if (Array.isArray(deletedRows)) {
+					// remove multiple rows from the grid
+					const rowsToRemove = deletedRows
+						.map((id) => gridRef.current.api.getRowNode(id.id))
 						.filter((node) => node)
 						.map((node) => node.data);
-					gridRef.current.api.applyTransaction({ remove: rowsToRemove });
+					gridRef.current.api.applyTransaction({
+						remove: rowsToRemove,
+					});
+				} else {
+					// remove one row from the grid
+					gridRef.current.api.applyTransaction({
+						remove: [gridRef.current.api.getRowNode(deletedRows.id).data],
+					});
 				}
 			} catch (error) {
 				console.error("Error deleting words:", error);
+				toast.error("An error occurred. Please refresh the page.");
 			}
 		}
 	};
@@ -173,7 +197,7 @@ export default function WordTable() {
 
 	// Row Data: The data to be displayed.
 	// Column Definitions: Defines & controls grid columns.
-	const [rowData, setRowData] = useState([]);
+
 	const [colDefs] = useState([
 		{
 			field: "sourceLanguage", // matches the name in data from api
@@ -201,7 +225,7 @@ export default function WordTable() {
 			editable: false,
 			cellRenderer: RootWordOffCanvas,
 		},
-		{ field: "statistics.flag" },
+		{ field: "statistics.flag", headerName: "Flag", width: 90 },
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
