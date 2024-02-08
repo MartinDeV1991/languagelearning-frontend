@@ -6,6 +6,7 @@ export default function UploadPage() {
 	return (
 		<Container>
 			<h1>Upload things here!</h1>
+			<UploadCSV />
 		</Container>
 	);
 }
