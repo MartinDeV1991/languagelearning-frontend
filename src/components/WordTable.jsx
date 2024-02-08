@@ -20,6 +20,44 @@ export default function WordTable() {
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
 	const [originalRowData, setOriginalRowData] = useState([]);
+	const [rowData, setRowData] = useState([]);
+	const [formData, setFormData] = useState({
+		word: "",
+		sourceLanguage: "NL",
+		translatedTo: "EN-GB",
+		contextSentence: "",
+	});
+
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setFormData({
+			...formData,
+			[name]: value,
+		});
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const newWord = await toast.promise(
+			postData(`api/word/user/${user_id}`, formData),
+			{
+				pending: "Adding...",
+				success: `Word '${formData.word}' successfully added.`,
+				error: "Failed to add word. Please try again.",
+			}
+		);
+		console.log(formData);
+		console.log(newWord);
+		// add to grid
+		setRowData((prevRowData) => [...prevRowData, newWord]);
+		// reset form
+		setFormData({
+			word: "",
+			sourceLanguage: "NL",
+			translatedTo: "EN-GB",
+			contextSentence: "",
+		});
+	};
 
 	async function fetchWords() {
 		setRowData(await fetchData(`api/word/user/${user_id}`)); // Update state of `rowData` to the fetched data
@@ -177,12 +215,49 @@ export default function WordTable() {
 
 	return (
 		<>
+			<Form className="mb-3" onSubmit={handleSubmit}>
+				<Row>
+					<Col xs={4} sm={3} md={2} lg={2} xl={1}>
+						<Form.Select
+							aria-label="Select language"
+							name="sourceLanguage"
+							value={formData.sourceLanguage}
+							onChange={handleInputChange}
+						>
+							<option disabled>Language</option>
+							<option value="NL">NL</option>
+							<option value="FR">FR</option>
+							<option value="ES">ES</option>
+							<option value="EN-GB">EN</option>
+						</Form.Select>
+					</Col>
+					<Col xs={8} sm={9} md={3} lg={3} xl={3}>
+						<Form.Control
+							placeholder="Word"
+							name="word"
+							value={formData.word}
+							onChange={handleInputChange}
+						/>
+					</Col>
+					<Col xs={9} sm={10} md={5} lg={5} xl={7} className="mt-2 mt-md-0">
+						<Form.Control
+							placeholder="Context sentence"
+							name="contextSentence"
+							value={formData.contextSentence}
+							onChange={handleInputChange}
+						/>
+					</Col>
+					<Col xs="auto" className="mt-1 mt-md-0">
+						<Button type="submit">Add</Button>
+					</Col>
+				</Row>
+			</Form>
 			<Form.Control
 				type="text"
 				placeholder="Search"
 				value={quickFilterText}
 				onChange={handleSearchChange}
-				className="mb-2"
+				className="m-auto mb-2"
 			/>
 			<div className={"ag-theme-quartz"} style={{ width: "100%", height: 600 }}>
 				<AgGridReact
