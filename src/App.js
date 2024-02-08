@@ -8,6 +8,7 @@ import {
 	QuizPage,
 	SignUpPage,
 	WordListPage,
+	StatisticsPage,
 } from "./pages";
 import TopNav from "partials/TopNav";
 import Footer from "partials/Footer";
@@ -23,6 +24,7 @@ function App() {
 				<Route path="/signup" element={<SignUpPage />} />
 				<Route path="/quiz" element={<QuizPage />} />
 				<Route path="/words" element={<WordListPage />} />
+				<Route path="/stats" element={<StatisticsPage />} />
 			</Routes>
 			<ToastContainer
 				position="top-right"
