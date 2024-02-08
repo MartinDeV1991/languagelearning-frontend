@@ -2,10 +2,16 @@ import { AgGridReact } from "ag-grid-react"; // React Grid Logic
 import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Form } from "react-bootstrap";
-import { ToastContainer, toast } from "react-toastify";
+import { Button, Col, Form, Row } from "react-bootstrap";
+import { toast } from "react-toastify";
 import RootWordOffCanvas from "./RootWordOffCanvas";
-import { deleteData, fetchData, putData } from "utils/api";
+import {
+	deleteMultiple,
+	deleteOne,
+	fetchData,
+	postData,
+	putData,
+} from "utils/api";
 import { flagFormatter } from "utils/formatter";
 
 export default function WordTable() {
