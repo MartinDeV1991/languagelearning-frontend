@@ -22,9 +22,7 @@ export default function WordTable() {
 	const [originalRowData, setOriginalRowData] = useState([]);
 
 	async function fetchWords() {
-		const rowData = await fetchData(`api/word/user/${user_id}`);
-		// const rowData = await fetchData(`api/word`);
-		setRowData(await rowData); // Update state of `rowData` to the fetched data
+		setRowData(await fetchData(`api/word/user/${user_id}`)); // Update state of `rowData` to the fetched data
 	}
 
 	// Fetch data & update rowData state
