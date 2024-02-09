@@ -28,13 +28,17 @@ export default function TopNav() {
 						align="end"
 						data-bs-theme="light"
 					>
-						<LinkContainer to={"/login"}>
-							<NavDropdown.Item>Log in</NavDropdown.Item>
+						<LinkContainer to={"/my-books"}>
+							<NavDropdown.Item>My books</NavDropdown.Item>
 						</LinkContainer>
+						<NavDropdown.Divider />
 						<LinkContainer to={"/logout"}>
 							<NavDropdown.Item>Log out</NavDropdown.Item>
 						</LinkContainer>
 						<NavDropdown.Divider />
+						<LinkContainer to={"/login"}>
+							<NavDropdown.Item>Log in</NavDropdown.Item>
+						</LinkContainer>
 						<LinkContainer to={"/signup"}>
 							<NavDropdown.Item>Sign up</NavDropdown.Item>
 						</LinkContainer>
