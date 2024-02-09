@@ -14,6 +14,7 @@ import TopNav from "partials/TopNav";
 import Footer from "partials/Footer";
 import { ToastContainer } from "react-toastify";
 import UploadPage from "pages/UploadPage";
+import MyBooksPage from "pages/MyBooksPage";
 
 function App() {
 	return (
@@ -27,6 +28,7 @@ function App() {
 				<Route path="/words" element={<WordListPage />} />
 				<Route path="/stats" element={<StatisticsPage />} />
 				<Route path="/upload" element={<UploadPage />} />
+				<Route path="/my-books" element={<MyBooksPage />} />
 			</Routes>
 			<ToastContainer
 				position="top-right"
