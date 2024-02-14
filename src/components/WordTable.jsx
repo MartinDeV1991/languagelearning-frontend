@@ -16,7 +16,7 @@ import { flagFormatter } from "utils/formatter";
 
 export default function WordTable() {
 	const gridRef = React.useRef(null);
-	let user_id = localStorage.getItem("languagelearning_id");
+	let user_id = 3;
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
 	const [originalRowData, setOriginalRowData] = useState([]);
@@ -195,6 +195,13 @@ export default function WordTable() {
 		setQuickFilterText(searchText);
 	};
 
+	const bookFormatter = (params) => {
+		if (params.value) {
+			return `${params.value.title} (${params.value.author})`;
+		}
+		return "N/A";
+	};
+
 	// Row Data: The data to be displayed.
 	// Column Definitions: Defines & controls grid columns.
 
@@ -225,7 +232,13 @@ export default function WordTable() {
 			editable: false,
 			cellRenderer: RootWordOffCanvas,
 		},
-		{ field: "statistics.flag", headerName: "Flag", width: 90 },
+		{ field: "book", headerName: "Book", valueFormatter: bookFormatter },
+		{
+			field: "statistics.flag",
+			headerName: "Flag",
+			width: 90,
+			cellRenderer: "agCheckboxCellRenderer",
+		},
 	]);
 
 	// Default column settings used for all columns (overridden by colDefs)
