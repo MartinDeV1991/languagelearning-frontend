@@ -1,14 +1,26 @@
-import React, { useState } from "react";
-import { Button, Offcanvas } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Col, Offcanvas, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { deleteOne, putData } from "utils/api";
+import { deleteOne, fetchData, putData } from "utils/api";
 
 export default function RootWordOffCanvas(params) {
 	const [rootWord, setRootWord] = useState(params.value);
+	const [words, setWords] = useState([]);
 	const [show, setShow] = useState(false);
 
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
+
+	const getWords = async (rootWordID) => {
+		const response = await fetchData(`api/root-word/${rootWordID}/words`);
+		setWords(response);
+	};
+
+	useEffect(() => {
+		if (params.value != null) {
+			getWords(params.value.id);
+		}
+	}, [params.value]);
 
 	const generateRootWord = async (wordID) => {
 		try {
@@ -39,6 +51,7 @@ export default function RootWordOffCanvas(params) {
 			toast.error("Couldn't delete that root word. Please try again.");
 		}
 	};
+
 	const unlinkRootWord = async (rootWordID, wordID) => {
 		// write backend endpoint to unlink word and root word
 		console.log(rootWordID);
@@ -60,20 +73,37 @@ export default function RootWordOffCanvas(params) {
 					<Offcanvas show={show} onHide={handleClose} placement="bottom">
 						<Offcanvas.Header closeButton>
 							<Offcanvas.Title>
-								<h2>{rootWord.word}</h2>
-								<h3>{rootWord.partOfSpeech}</h3>
+								<h2>
+									<b>{rootWord.word}</b> ({rootWord.partOfSpeech})
+								</h2>
+								<h3></h3>
 							</Offcanvas.Title>
 						</Offcanvas.Header>
 						<Offcanvas.Body>
-							<h4>Definition: {rootWord.definitionInEnglish}</h4>
-							<Button onClick={() => deleteRootWord(rootWord.id)}>
-								Delete
-							</Button>
-							<Button
-								onClick={() => unlinkRootWord(rootWord.id, params.data.id)}
-							>
-								Unlink
-							</Button>
+							<Row>
+								<Col>
+									<h4>Definition: {rootWord.definitionInEnglish}</h4>
+									<Button onClick={() => deleteRootWord(rootWord.id)}>
+										Delete
+									</Button>
+									<Button
+										onClick={() => unlinkRootWord(rootWord.id, params.data.id)}
+									>
+										Unlink
+									</Button>
+								</Col>
+								<Col>
+									<ul>
+										{words.map((word) => {
+											return (
+												<li key={word.id}>
+													{word.word} - {word.contextSentence}
+												</li>
+											);
+										})}
+									</ul>
+								</Col>
+							</Row>
 						</Offcanvas.Body>
 					</Offcanvas>
 				</>
