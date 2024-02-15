@@ -107,3 +107,24 @@ export const deleteMultiple = async (endpoint, arrayOfIds) => {
 		throw error;
 	}
 };
+
+export const uploadFile = async (endpoint, file) => {
+	const formData = new FormData();
+	formData.append("file", file);
+
+	try {
+		const response = await fetch(`${BASE_URL}/${endpoint}`, {
+			method: "POST",
+			body: formData,
+		});
+
+		if (!response.ok) {
+			console.log(response);
+			throw new Error("Network response was not ok: " + response.status);
+		}
+		return response;
+	} catch (error) {
+		console.error("There was a problem in uploadFile: ", error);
+		throw error;
+	}
+};
