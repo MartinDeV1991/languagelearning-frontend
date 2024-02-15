@@ -31,8 +31,8 @@ export default function TopNav() {
 						<LinkContainer to={"/my-books"}>
 							<NavDropdown.Item>My books</NavDropdown.Item>
 						</LinkContainer>
-						<LinkContainer to={"/upload"}>
-							<NavDropdown.Item>Upload vocab</NavDropdown.Item>
+						<LinkContainer to={"/import"}>
+							<NavDropdown.Item>Import vocab</NavDropdown.Item>
 						</LinkContainer>
 						<NavDropdown.Divider />
 						<LinkContainer to={"/logout"}>
