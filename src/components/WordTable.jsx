@@ -66,6 +66,7 @@ export default function WordTable() {
 	// Fetch data & update rowData state
 	useEffect(() => {
 		fetchWords();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const getRowId = (params) => params.data.id;
