@@ -16,7 +16,7 @@ import { flagFormatter } from "utils/formatter";
 
 export default function WordTable() {
 	const gridRef = React.useRef(null);
-	let user_id = 3;
+	let user_id = localStorage.getItem("languagelearning_id");
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
 	const [originalRowData, setOriginalRowData] = useState([]);
@@ -66,6 +66,7 @@ export default function WordTable() {
 	// Fetch data & update rowData state
 	useEffect(() => {
 		fetchWords();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const getRowId = (params) => params.data.id;

@@ -76,7 +76,6 @@ export default function RootWordOffCanvas(params) {
 								<h2>
 									<b>{rootWord.word}</b> ({rootWord.partOfSpeech})
 								</h2>
-								<h3></h3>
 							</Offcanvas.Title>
 						</Offcanvas.Header>
 						<Offcanvas.Body>

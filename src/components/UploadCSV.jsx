@@ -4,13 +4,14 @@ import Papa from "papaparse";
 import { postData } from "utils/api";
 
 export default function UploadCSV() {
+	let user_id = localStorage.getItem("languagelearning_id");
 	const sourceLanguage = "NL";
 	const translatedTo = "EN-GB";
 
 	const addWords = async (words) => {
 		console.log(words);
 		try {
-			postData("api/word/user/3/multiple", words);
+			postData(`api/word/user/${user_id}/multiple`, words);
 		} catch (error) {
 			console.error(error);
 		}
@@ -39,7 +40,7 @@ export default function UploadCSV() {
 	const convertCSV = async () => {
 		const data = Papa.parse(await fetchCSVFile(), {
 			header: true,
-			preview: 5,
+			preview: 20,
 		});
 		console.log(data);
 		addWords(await convertToWordArray(data.data));
