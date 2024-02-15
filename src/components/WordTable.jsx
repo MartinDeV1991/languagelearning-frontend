@@ -16,7 +16,7 @@ import { flagFormatter } from "utils/formatter";
 
 export default function WordTable() {
 	const gridRef = React.useRef(null);
-	let user_id = 3;
+	let user_id = localStorage.getItem("languagelearning_id");
 	const [quickFilterText, setQuickFilterText] = useState("");
 	const [selectedRows, setSelectedRows] = useState([]);
 	const [originalRowData, setOriginalRowData] = useState([]);
