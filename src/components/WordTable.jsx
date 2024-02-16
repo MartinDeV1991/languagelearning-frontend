@@ -12,7 +12,7 @@ import {
 	postData,
 	putData,
 } from "utils/api";
-import { flagFormatter } from "utils/formatter";
+import { bookFormatter, flagFormatter } from "utils/formatter";
 
 export default function WordTable() {
 	const gridRef = React.useRef(null);
@@ -194,13 +194,6 @@ export default function WordTable() {
 	const handleSearchChange = (event) => {
 		const searchText = event.target.value;
 		setQuickFilterText(searchText);
-	};
-
-	const bookFormatter = (params) => {
-		if (params.value) {
-			return `${params.value.title} (${params.value.author})`;
-		}
-		return "N/A";
 	};
 
 	// Row Data: The data to be displayed.
