@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Col, Row, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { uploadFile } from "utils/api";
+import CsvWordTable from "./CsvWordTable";
 
 export default function UploadKindleDB() {
 	const [file, setFile] = useState(null);
@@ -62,7 +63,9 @@ export default function UploadKindleDB() {
 				{data && (
 					<Row className="justify-items-between">
 						<Col>
-							<h5>CSV formatted data:</h5>
+							<h4>Select words to import</h4>
+							<CsvWordTable csvData={data} />
+							<h5 className="mt-3">CSV formatted data:</h5>
 							<pre>{data}</pre> {/* Display CSV data */}
 						</Col>
 					</Row>
