@@ -8,11 +8,15 @@ import { fetchData } from "utils/api";
 
 Chart.register(CategoryScale);
 
-const Graph = ({ choice }) => {
+const Graph = ({ type, language1, language2 }) => {
 	let user_id = localStorage.getItem("languagelearning_id");
+
+	const sourceLanguage = language1;
+	const translatedTo = language2;
 
 	const [rowData, setRowData] = useState([]);
 	const [sortingOrder, setSortingOrder] = useState("normal");
+
 	const handleSortingChange = (event) => {
 		setSortingOrder(event);
 	};
@@ -22,7 +26,7 @@ const Graph = ({ choice }) => {
 		datasets: [
 			{
 				label:
-					choice === "correct"
+					type === "correct"
 						? "Number of Correct Guesses"
 						: "Number of Total Attempts",
 				data: [],
@@ -31,10 +35,11 @@ const Graph = ({ choice }) => {
 	});
 
 	const updateChart = async () => {
-		const dataWithLabels = rowData.map((item) => ({
+		const filteredData = rowData.filter((item) => item.sourceLanguage === sourceLanguage && item.translatedTo === translatedTo);
+		const dataWithLabels = filteredData.map((item) => ({
 			label: item.word,
 			data: item.statistics
-				? choice === "correct"
+				? type === "correct"
 					? item.statistics.guessedCorrectly
 					: item.statistics.attempts
 				: 0,
@@ -53,11 +58,17 @@ const Graph = ({ choice }) => {
 			labels: labels,
 			datasets: [
 				{
-					label:
-						choice === "correct"
-							? "Number of Correct Guesses"
-							: "Number of Total Attempts",
+					label: type === "correct"
+						? "Number of Correct Guesses"
+						: "Number of Total Attempts",
 					data: data,
+					backgroundColor: type === "correct"
+						? "rgba(75, 192, 192, 0.3)"
+						: "rgba(54, 162, 235, 0.3)",
+					borderColor: type === "correct"
+						? "rgb(75, 192, 192)"
+						: "rgb(54, 162, 235)",
+					borderWidth: 1
 				},
 			],
 		});
@@ -72,13 +83,11 @@ const Graph = ({ choice }) => {
 
 	useEffect(() => {
 		loadStats();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
 		updateChart();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [choice, sortingOrder, user_id, rowData]);
+	}, [user_id, type, translatedTo, sourceLanguage, sortingOrder, rowData]);
 
 	return (
 		<div
@@ -95,15 +104,15 @@ const Graph = ({ choice }) => {
 					<Dropdown.Item eventKey="normal">Normal</Dropdown.Item>
 				</Dropdown.Menu>
 			</Dropdown>
+
 			<Bar
 				data={chartData}
 				options={{
 					plugins: {
 						title: {
-							display: true,
-							text: `Number of ${
-								choice === "correct" ? "Correct Guesses" : "Total Attempts"
-							} by Word`,
+							display: false,
+							text: `Number of ${type === "correct" ? "Correct Guesses" : "Total Attempts"
+								} by Word`,
 						},
 						legend: {
 							display: true,

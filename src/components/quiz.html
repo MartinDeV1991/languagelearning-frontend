@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game with Hints</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: left;
+            margin: 50px;
+        }
+
+        #output {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        #inputBox {
+            margin-top: 20px;
+        }
+
+        #hintButtons {
+            margin-top: 10px;
+        }
+
+        button {
+            margin: 5px;
+        }
+
+        .hintOn {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Quiz Game with Hints</h1>
+
+    <div id="output">Welcome! Click "Start" to begin.</div>
+    <div id="inputBox">
+        <button onclick="startGame()">Start</button>
+    </div>
+    <div id="hintButtons"></div>
+
+    <script>
+        const path = `https://language-backend.azurewebsites.net/`
+
+        let currentQuestionIndex = 0;
+        let hint1On = false;
+        let hint2On = false;
+        let hint3On = false;
+        let incorrectAttempt = false;
+
+        let questions
+        let answer
+        let sentenceOriginal
+        let sentenceTranslated
+
+        async function startGame() {
+            const data = await loadQuestions()
+            console.log("data: ", data)
+            questions = data.map(item => item.word)
+            answers = data.map(item => item.translation)
+            sentenceOriginal = data.map(item => item.contextSentence)
+            sentenceTranslated = data.map(item => item.translatedContextSentence)
+
+            console.log(questions)
+            console.log(sentenceTranslated)
+
+            displayQuestion();
+            displayHintButtons();
+            incorrectAttempt = false;
+        }
+
+        async function loadQuestions() {
+            // Define questions, answers, and sentences
+            const response = await fetch(`${path}api/word`)
+            const data = await response.json()
+            return data
+        }
+
+        function displayQuestion() {
+            // Display the current question
+            document.getElementById('output').innerHTML = questions[currentQuestionIndex];
+
+            // Show input box for user's answer
+            document.getElementById('inputBox').innerHTML = '<input type="text" id="userAnswer" placeholder="Your answer"> <button onclick="checkAnswer()">Submit</button>';
+        }
+
+        function displayHintButtons() {
+            // Display hint buttons
+            const hintButtonsDiv = document.getElementById('hintButtons');
+            hintButtonsDiv.innerHTML = `<button id="hint1Button" onclick="toggleHint('hint1')">Hint 1</button>`;
+            hintButtonsDiv.innerHTML += `<button id="hint2Button" onclick="toggleHint('hint2')">Hint 2</button>`;
+            hintButtonsDiv.innerHTML += `<button id="hint3Button" onclick="toggleHint('hint3')">Hint 3</button>`;
+        }
+
+        function toggleHint(hintType) {
+            // Toggle the hint button and display/hide the hint
+            const hintButton = document.getElementById(`${hintType}Button`);
+            if (hintType === 'hint1') {
+                hint1On = !hint1On;
+                if (hint1On) {
+                    hintButton.classList.add('hintOn');
+                } else {
+                    hintButton.classList.remove('hintOn');
+                }
+            } else if (hintType === 'hint2') {
+                hint2On = !hint2On;
+                if (hint2On) {
+                    hintButton.classList.add('hintOn');
+                } else {
+                    hintButton.classList.remove('hintOn');
+                }
+            } else if (hintType === 'hint3') {
+                hint3On = !hint3On;
+                if (hint3On) {
+                    hintButton.classList.add('hintOn');
+                } else {
+                    hintButton.classList.remove('hintOn');
+                }
+            }
+            displayHints();
+        }
+
+        function displayHints() {
+            // Display the hints based on the current state
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = questions[currentQuestionIndex];
+            if (hint1On) {
+                const answer = answers[currentQuestionIndex];
+                const maskedAnswer = Array.from(answer).map(char => (char === ' ' ? ' ' : '*')).join('');
+                outputDiv.innerHTML += `<br>Hint 1: ${maskedAnswer}`;
+            }
+            if (hint2On) {
+                const sentenceOr = sentenceOriginal[currentQuestionIndex];
+                outputDiv.innerHTML += `<br>Hint 2: ${sentenceOr}`;
+            }
+            if (hint3On) {
+                const sentenceTr = sentenceTranslated[currentQuestionIndex];
+                outputDiv.innerHTML += `<br>Hint 3: ${sentenceTr}`;
+            }
+        }
+
+        function clearHints() {
+            // Clear the hints from the output
+            document.getElementById('output').innerHTML = document.getElementById('output').innerHTML.split('<br>').filter(line => !line.startsWith('Hint')).join('<br>');
+            hint1On = false
+            hint2On = false
+            hint3On = false
+        }
+
+        function checkAnswer() {
+            // Get user's answer from the input box
+            const userAnswer = document.getElementById('userAnswer').value;
+
+            // Check if the user's answer is correct
+            if (userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()) {
+                // Check if it's the first correct attempt to avoid duplicate messages
+                if (!incorrectAttempt) {
+                    document.getElementById('output').innerHTML += '<br>Correct!';
+                }
+
+                // Clear hints along with correct answer message
+                clearHints();
+
+                // Move to the next question
+                currentQuestionIndex++;
+
+                // If there are more questions, display the next question and reset hint messages
+                if (currentQuestionIndex < questions.length) {
+                    displayQuestion();
+                    displayHintButtons();
+                } else {
+                    // End of the game
+                    document.getElementById('output').innerHTML += '<br>Congratulations! You completed the quiz.';
+                    document.getElementById('inputBox').innerHTML = '';
+                    document.getElementById('hintButtons').innerHTML = '';
+                }
+            } else {
+                // Display "Incorrect" only once for each question
+                if (!incorrectAttempt) {
+                    document.getElementById('output').innerHTML += '<br>Incorrect. Try again.';
+                    incorrectAttempt = true;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
