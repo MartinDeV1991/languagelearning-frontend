@@ -5,7 +5,6 @@ import { Form, Button, Container } from "react-bootstrap";
 import "./quiz.css";
 import QuizAnimation from "../components/QuizAnimation";
 import { fetchData, putData } from "utils/api";
-import { flagFormatter } from "utils/formatter";
 
 const Quiz = () => {
 	let user_id = localStorage.getItem("languagelearning_id");
@@ -32,6 +31,8 @@ const Quiz = () => {
 	const [gameStarted, setGameStarted] = useState(false);
 
 	const [wordIds, setWordIds] = useState([]);
+
+	const [attempts, setAttempts] = useState(0);
 
 	useEffect(() => {
 		setOutput(questions[currentQuestionIndex]);
@@ -64,22 +65,18 @@ const Quiz = () => {
 	};
 
 	const startGame = async () => {
-		console.log("Language 1 selected:", language1);
-		console.log("Language 2 selected:", language2);
 		try {
 			const data = await fetchData(`api/word/user/${user_id}`);
 			let filteredData;
-			console.log("data: ", data);
 			const languageFilteredData = data.filter(
 				(item) =>
 					item.sourceLanguage === language1 && item.translatedTo === language2
 			);
-			console.log("languageFilteredData: ", languageFilteredData);
 
 			if (quizType === "wrong") {
 				filteredData = languageFilteredData.filter((item) =>
 					item.statistics?.attempts !== undefined &&
-					item.statistics.attempts > 0
+						item.statistics.attempts > 0
 						? item.statistics.guessedCorrectly / item.statistics.attempts < 1
 						: false
 				);
@@ -89,10 +86,10 @@ const Quiz = () => {
 					return !a.statistics && !b.statistics
 						? 0
 						: !a.statistics
-						? -1
-						: !b.statistics
-						? 1
-						: a.statistics.attempts - b.statistics.attempts;
+							? -1
+							: !b.statistics
+								? 1
+								: a.statistics.attempts - b.statistics.attempts;
 				});
 			} else if (quizType === "flagged") {
 				filteredData = languageFilteredData.filter(
@@ -132,12 +129,24 @@ const Quiz = () => {
 			correct = true;
 			if (currentQuestionIndex + 1 <= Math.min(questions.length, 10)) {
 				setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+				setAttempts(0);
 			} else {
 				setFeedback("Congratulations! You completed the quiz.");
 				setInput("");
 			}
 		} else {
-			setFeedback("Incorrect. Try again.");
+			if (attempts >= 2) {
+				if (currentQuestionIndex + 1 <= Math.min(questions.length, 10)) {
+					setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+					setAttempts(0);
+				} else {
+					setFeedback("Congratulations! You completed the quiz.");
+					setInput("");
+				}
+			} else {
+				setFeedback("Incorrect. Try again.");
+				setAttempts(attempts + 1);
+			}
 		}
 		await putData(`api/statistics/add_attempts/${wordId}`, correct);
 	};
@@ -148,6 +157,36 @@ const Quiz = () => {
 			{gameStarted &&
 				currentQuestionIndex + 1 <= Math.min(questions.length, 10) && (
 					<div>
+						<div className="mb-3">
+							<strong>
+								{language1}
+							</strong>{" "}
+							to{" "}
+							<strong>
+								{language2}
+							</strong>
+						</div>
+
+						<Form onSubmit={checkAnswer} className="mb-5">
+							<div><strong>Question #{currentQuestionIndex + 1}</strong></div>
+							<div>Translate: <strong>{output}</strong></div>
+							<div style={{ color: "red" }}>{feedback}</div>
+
+							<Form.Group controlId="inputBox">
+								<Form.Control
+									type="text"
+									placeholder="Type your answer here"
+									value={input}
+									onChange={handleInputChange}
+									style={{ width: "300px" }}
+								/>
+							</Form.Group>
+							<Button variant="primary" type="submit">
+								Submit
+							</Button>
+						</Form>
+						<div>You have had {attempts} attempts for this question.</div>
+
 						<Button onClick={() => setHint1(!hint1)}>Hint 1</Button>
 						<Button onClick={() => setHint2(!hint2)}>Hint 2</Button>
 						<Button onClick={() => setHint3(!hint3)}>Hint 3</Button>
@@ -173,33 +212,6 @@ const Quiz = () => {
 							</div>
 						)}
 
-						<Form onSubmit={checkAnswer}>
-							<div>
-								<strong>
-									{language1} {flagFormatter({ value: language1 })}
-								</strong>{" "}
-								to{" "}
-								<strong>
-									{language2} {flagFormatter({ value: language2 })}
-								</strong>
-							</div>
-							<div>Question: {currentQuestionIndex + 1}</div>
-							<div>Translate: {output}</div>
-							<div style={{ color: "red" }}>{feedback}</div>
-
-							<Form.Group controlId="inputBox">
-								<Form.Control
-									type="text"
-									placeholder="Type your answer here"
-									value={input}
-									onChange={handleInputChange}
-									style={{ width: "300px" }}
-								/>
-							</Form.Group>
-							<Button variant="primary" type="submit">
-								Submit
-							</Button>
-						</Form>
 					</div>
 				)}{" "}
 			{!gameStarted && (
