@@ -8,11 +8,12 @@ import { fetchData } from "utils/api";
 
 Chart.register(CategoryScale);
 
-const Graph = ({ type, language1, language2 }) => {
+const Graph = ({ type, language1, language2, speechType }) => {
 	let user_id = localStorage.getItem("languagelearning_id");
 
 	const sourceLanguage = language1;
 	const translatedTo = language2;
+	const partOfSpeech = speechType;
 
 	const [rowData, setRowData] = useState([]);
 	const [sortingOrder, setSortingOrder] = useState("normal");
@@ -35,7 +36,12 @@ const Graph = ({ type, language1, language2 }) => {
 	});
 
 	const updateChart = async () => {
-		const filteredData = rowData.filter((item) => item.sourceLanguage === sourceLanguage && item.translatedTo === translatedTo);
+		console.log()
+		const filteredData = rowData.filter((item) =>
+			(sourceLanguage === 'all' || item.sourceLanguage === sourceLanguage) &&
+			(translatedTo === 'all' || item.translatedTo === translatedTo) &&
+			(partOfSpeech === 'all' || item.rootWord.partOfSpeech === partOfSpeech));
+
 		const dataWithLabels = filteredData.map((item) => ({
 			label: item.word,
 			data: item.statistics
@@ -87,7 +93,7 @@ const Graph = ({ type, language1, language2 }) => {
 
 	useEffect(() => {
 		updateChart();
-	}, [user_id, type, translatedTo, sourceLanguage, sortingOrder, rowData]);
+	}, [user_id, type, translatedTo, sourceLanguage, partOfSpeech, sortingOrder, rowData]);
 
 	return (
 		<div
@@ -96,7 +102,7 @@ const Graph = ({ type, language1, language2 }) => {
 		>
 			<Dropdown onSelect={handleSortingChange}>
 				<Dropdown.Toggle variant="primary" id="dropdown-basic">
-					Sorting Order
+					Sorted: {sortingOrder}
 				</Dropdown.Toggle>
 				<Dropdown.Menu>
 					<Dropdown.Item eventKey="highest">Highest</Dropdown.Item>
