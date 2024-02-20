@@ -102,7 +102,7 @@ const Graph = ({ type, language1, language2, speechType }) => {
 		>
 			<Dropdown onSelect={handleSortingChange}>
 				<Dropdown.Toggle variant="primary" id="dropdown-basic">
-					Sorting Order
+				Sorted: {sortingOrder}
 				</Dropdown.Toggle>
 				<Dropdown.Menu>
 					<Dropdown.Item eventKey="highest">Highest</Dropdown.Item>

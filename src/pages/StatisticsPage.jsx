@@ -29,10 +29,10 @@ export default function StatisticsPage() {
 				<div>
 					<Dropdown onSelect={handleSourceLanguageChange}>
 						<Dropdown.Toggle variant="secondary" id="dropdown-basic">
-							Language from
+							{sourceLanguage === "all" ? "All source languages" : sourceLanguage}
 						</Dropdown.Toggle>
 						<Dropdown.Menu>
-							<Dropdown.Item eventKey="all">all</Dropdown.Item>
+							<Dropdown.Item eventKey="all">All source languages</Dropdown.Item>
 							<Dropdown.Item eventKey="NL">NL</Dropdown.Item>
 							<Dropdown.Item eventKey="EN-GB">EN-GB</Dropdown.Item>
 							<Dropdown.Item eventKey="EN">EN</Dropdown.Item>
@@ -44,10 +44,10 @@ export default function StatisticsPage() {
 
 					<Dropdown onSelect={handleTranslatedLanguageChange}>
 						<Dropdown.Toggle variant="secondary" id="dropdown-basic">
-							Language to
+							{translatedTo === "all" ? "All target languages" : translatedTo}
 						</Dropdown.Toggle>
 						<Dropdown.Menu>
-							<Dropdown.Item eventKey="all">all</Dropdown.Item>
+							<Dropdown.Item eventKey="all">All target languages</Dropdown.Item>
 							<Dropdown.Item eventKey="NL">NL</Dropdown.Item>
 							<Dropdown.Item eventKey="EN-GB">EN-GB</Dropdown.Item>
 							<Dropdown.Item eventKey="EN">EN</Dropdown.Item>
@@ -59,10 +59,10 @@ export default function StatisticsPage() {
 
 					<Dropdown onSelect={handlePartOfSpeechChange}>
 						<Dropdown.Toggle variant="secondary" id="dropdown-basic">
-							Part of speech
+							{partOfSpeech === "all" ? "All parts of speech" : partOfSpeech}
 						</Dropdown.Toggle>
 						<Dropdown.Menu>
-							<Dropdown.Item eventKey="all">all</Dropdown.Item>
+							<Dropdown.Item eventKey="all">All parts of speech</Dropdown.Item>
 							<Dropdown.Item eventKey="verb">verb</Dropdown.Item>
 							<Dropdown.Item eventKey="noun">noun</Dropdown.Item>
 							<Dropdown.Item eventKey="interjection">interjection</Dropdown.Item>
