@@ -1,6 +1,6 @@
 import Statistics from 'components/Statistics';
 import Graph from 'components/Graph';
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Container, Dropdown } from "react-bootstrap";
 
 export default function StatisticsPage() {
