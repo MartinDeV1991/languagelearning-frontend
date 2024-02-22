@@ -1,9 +1,8 @@
-import Statistics from 'components/Statistics';
-import Graph from 'components/Graph';
+import LineGraph from 'components/LineGraph';
 import React, { useState } from "react";
 import { Container, Dropdown } from "react-bootstrap";
 
-export default function StatisticsPage() {
+export default function LogPage() {
 
 	const [sourceLanguage, setSourceLanguage] = useState('all');
 	const [translatedTo, setTranslatedTo] = useState('all');
@@ -73,10 +72,9 @@ export default function StatisticsPage() {
 
 				</div>
 
-				<Graph type="correct" language1={sourceLanguage} language2={translatedTo} speechType={partOfSpeech} />
-				<Graph type="attempt" language1={sourceLanguage} language2={translatedTo} speechType={partOfSpeech} />
+				<LineGraph type="correct" language1={sourceLanguage} language2={translatedTo} />
+				<LineGraph type="tries" language1={sourceLanguage} language2={translatedTo} />
 			</div>
-			<Statistics />
 			<div className='mb-5'></div>
 		</Container>
 	)

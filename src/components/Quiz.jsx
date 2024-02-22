@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import "./quiz.css";
 import QuizAnimation from "../components/QuizAnimation";
-import { fetchData, putData } from "utils/api";
+import { fetchData, postData, putData } from "utils/api";
 import QuizInitialization from "./QuizInitialization";
 
 const Quiz = () => {
 	let user_id = localStorage.getItem("languagelearning_id");
+
+	const maxQuestions = 10;
 
 	const [language1, setLanguage1] = useState("NL");
 	const [language2, setLanguage2] = useState("EN-GB");
@@ -17,6 +19,8 @@ const Quiz = () => {
 	const [input, setInput] = useState("");
 	const [output, setOutput] = useState("");
 	const [feedback, setFeedback] = useState("");
+	const [correct, setCorrect] = useState(false);
+	const [displayInput, setDisplayInput] = useState(true);
 
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
@@ -30,6 +34,7 @@ const Quiz = () => {
 	const [hint3, setHint3] = useState(false);
 
 	const [gameStarted, setGameStarted] = useState(false);
+	const [gameFinished, setGameFinished] = useState(false);
 
 	const [wordIds, setWordIds] = useState([]);
 
@@ -55,6 +60,7 @@ const Quiz = () => {
 	const restartQuiz = () => {
 		setCurrentQuestionIndex(0);
 		setGameStarted(false);
+		setGameFinished(false);
 	};
 
 	const handleInputChange = (e) => {
@@ -121,42 +127,86 @@ const Quiz = () => {
 
 	const checkAnswer = async (e) => {
 		e.preventDefault();
+		setCorrect(false);
 		const userAnswer = input;
-		let correct = false;
 		const wordId = wordIds[currentQuestionIndex];
 		if (
 			userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()
 		) {
-			correct = true;
-			if (currentQuestionIndex + 1 <= Math.min(questions.length, 10)) {
-				setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-				setAttempts(0);
-			} else {
-				setFeedback("Congratulations! You completed the quiz.");
-				setInput("");
-			}
-		} else {
-			if (attempts >= 2) {
-				if (currentQuestionIndex + 1 <= Math.min(questions.length, 10)) {
+			setCorrect(true);
+			if (currentQuestionIndex + 1 <= Math.min(questions.length, maxQuestions)) {
+				setDisplayInput(false);
+				setFeedback(`You answered correctly: The answer was "${answers[currentQuestionIndex]}"`);
+				setTimeout(() => {
 					setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
 					setAttempts(0);
+					setDisplayInput(true);
+				}, 2000);
+
+			} else {
+				setFeedback("Congratulations! You completed the quiz.");
+				const today = new Date();
+					const year = today.getFullYear();
+					const month = (today.getMonth() + 1).toString().padStart(2, '0');
+					const day = today.getDate().toString().padStart(2, '0');
+
+					const formattedDateToday = `${year}-${month}-${day}`;
+					const logData = {
+						testType: "all",
+						sourceLanguage: language1,
+						targetLanguage: language2,
+						numberOfQuestions: 10,
+						numberOfCorrectAnswers: 9,
+						date: formattedDateToday
+					}
+					postData(`api/log/${user_id}`, logData);
+				setInput("");
+				setDisplayInput(false);
+				setTimeout(() => setGameFinished(true), 3000);
+			}
+			await putData(`api/statistics/add_attempts/${wordId}`, true);
+		} else {
+			if (attempts >= 2) {
+				if (currentQuestionIndex + 1 <= Math.min(questions.length, maxQuestions)) {
+					setFeedback(`You answered incorrectly: The answer was "${answers[currentQuestionIndex]}"`);
+					setTimeout(() => {
+						setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+						setAttempts(0);
+					}, 2000);
 				} else {
 					setFeedback("Congratulations! You completed the quiz.");
+					const today = new Date();
+					const year = today.getFullYear();
+					const month = (today.getMonth() + 1).toString().padStart(2, '0');
+					const day = today.getDate().toString().padStart(2, '0');
+
+					const formattedDateToday = `${year}-${month}-${day}`;
+					const logData = {
+						testType: "all",
+						sourceLanguage: language1,
+						targetLanguage: language2,
+						numberOfQuestions: 10,
+						numberOfCorrectAnswers: 9,
+						date: formattedDateToday
+					}
+					postData(`api/log/${user_id}`, logData);
 					setInput("");
+					setDisplayInput(false);
+					setTimeout(() => setGameFinished(true), 3000);
 				}
+				await putData(`api/statistics/add_attempts/${wordId}`, false);
 			} else {
 				setFeedback("Incorrect. Try again.");
 				setAttempts(attempts + 1);
 			}
 		}
-		await putData(`api/statistics/add_attempts/${wordId}`, correct);
 	};
 
 	return (
 		<Container className="mt-4">
 			<h1>Quiz Game with Hints</h1>
 			{gameStarted &&
-				currentQuestionIndex + 1 <= Math.min(questions.length, 10) && (
+				!gameFinished && (
 					<div>
 						<div className="mb-3">
 							<strong>
@@ -171,7 +221,7 @@ const Quiz = () => {
 						<Form onSubmit={checkAnswer} className="mb-5">
 							<div><strong>Question #{currentQuestionIndex + 1}</strong></div>
 							<div>Translate: <strong>{output}</strong></div>
-							<div style={{ color: "red" }}>{feedback}</div>
+							<div style={{ color: correct === true ? "green" : "red", fontSize: "30px" }}>{feedback}</div>
 
 							<Form.Group controlId="inputBox">
 								<Form.Control
@@ -179,10 +229,10 @@ const Quiz = () => {
 									placeholder="Type your answer here"
 									value={input}
 									onChange={handleInputChange}
-									style={{ width: "300px" }}
+									style={{ width: "300px", display: displayInput ? "block" : "none" }}
 								/>
 							</Form.Group>
-							<Button variant="primary" type="submit">
+							<Button variant="primary" type="submit" style={{ display: displayInput ? "block" : "none" }}>
 								Submit
 							</Button>
 						</Form>
