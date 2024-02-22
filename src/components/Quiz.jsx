@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import "./quiz.css";
 import QuizAnimation from "../components/QuizAnimation";
-import { fetchData, putData } from "utils/api";
+import { fetchData, postData, putData } from "utils/api";
 import QuizInitialization from "./QuizInitialization";
 
 const Quiz = () => {
@@ -145,6 +145,21 @@ const Quiz = () => {
 
 			} else {
 				setFeedback("Congratulations! You completed the quiz.");
+				const today = new Date();
+					const year = today.getFullYear();
+					const month = (today.getMonth() + 1).toString().padStart(2, '0');
+					const day = today.getDate().toString().padStart(2, '0');
+
+					const formattedDateToday = `${year}-${month}-${day}`;
+					const logData = {
+						testType: "all",
+						sourceLanguage: language1,
+						targetLanguage: language2,
+						numberOfQuestions: 10,
+						numberOfCorrectAnswers: 9,
+						date: formattedDateToday
+					}
+					postData(`api/log/${user_id}`, logData);
 				setInput("");
 				setDisplayInput(false);
 				setTimeout(() => setGameFinished(true), 3000);
@@ -160,6 +175,21 @@ const Quiz = () => {
 					}, 2000);
 				} else {
 					setFeedback("Congratulations! You completed the quiz.");
+					const today = new Date();
+					const year = today.getFullYear();
+					const month = (today.getMonth() + 1).toString().padStart(2, '0');
+					const day = today.getDate().toString().padStart(2, '0');
+
+					const formattedDateToday = `${year}-${month}-${day}`;
+					const logData = {
+						testType: "all",
+						sourceLanguage: language1,
+						targetLanguage: language2,
+						numberOfQuestions: 10,
+						numberOfCorrectAnswers: 9,
+						date: formattedDateToday
+					}
+					postData(`api/log/${user_id}`, logData);
 					setInput("");
 					setDisplayInput(false);
 					setTimeout(() => setGameFinished(true), 3000);

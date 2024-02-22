@@ -4,5 +4,6 @@ import LoginPage from "./LoginPage";
 import SignUpPage from "./SignUpPage";
 import WordListPage from "./WordListPage";
 import StatisticsPage from "./StatisticsPage"
+import LogPage from "./LogPage"
 
-export { HomePage, LoginPage, QuizPage, SignUpPage, WordListPage, StatisticsPage };
+export { HomePage, LoginPage, QuizPage, SignUpPage, WordListPage, StatisticsPage, LogPage };

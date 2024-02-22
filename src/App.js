@@ -9,6 +9,7 @@ import {
 	SignUpPage,
 	WordListPage,
 	StatisticsPage,
+	LogPage
 } from "./pages";
 import TopNav from "partials/TopNav";
 import Footer from "partials/Footer";
@@ -28,6 +29,7 @@ function App() {
 				<Route path="/quiz" element={<QuizPage />} />
 				<Route path="/words" element={<WordListPage />} />
 				<Route path="/stats" element={<StatisticsPage />} />
+				<Route path="/log" element={<LogPage />} />
 				<Route path="/import" element={<ImportPage />} />
 				<Route path="/my-books" element={<MyBooksPage />} />
 			</Routes>

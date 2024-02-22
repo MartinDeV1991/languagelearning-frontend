@@ -20,6 +20,9 @@ export default function TopNav() {
 					<LinkContainer to={"/stats"}>
 						<Nav.Link>Statistics</Nav.Link>
 					</LinkContainer>
+					<LinkContainer to={"/log"}>
+						<Nav.Link>Log</Nav.Link>
+					</LinkContainer>
 				</Nav>
 				<Nav className="ms-auto">
 					<NavDropdown
