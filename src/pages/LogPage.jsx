@@ -56,20 +56,6 @@ export default function LogPage() {
 						</Dropdown.Menu>
 					</Dropdown>
 
-					<Dropdown onSelect={handlePartOfSpeechChange}>
-						<Dropdown.Toggle variant="secondary" id="dropdown-basic">
-							{partOfSpeech === "all" ? "All parts of speech" : partOfSpeech}
-						</Dropdown.Toggle>
-						<Dropdown.Menu>
-							<Dropdown.Item eventKey="all">All parts of speech</Dropdown.Item>
-							<Dropdown.Item eventKey="verb">verb</Dropdown.Item>
-							<Dropdown.Item eventKey="noun">noun</Dropdown.Item>
-							<Dropdown.Item eventKey="interjection">interjection</Dropdown.Item>
-							<Dropdown.Item eventKey="adverb">adverb</Dropdown.Item>
-							<Dropdown.Item eventKey="adjective">adjective</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>
-
 				</div>
 
 				<LineGraph type="correct" language1={sourceLanguage} language2={translatedTo} />
