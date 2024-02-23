@@ -1,11 +1,12 @@
 import React from "react";
 
 import "./quiz.css";
+import { Scale } from "chart.js";
 
 
 const QuizInitialization = (
     { language1, language2, handleLanguage1Change, handleLanguage2Change,
-        quizType, handleQuizTypeChange, startGame
+        quizType, handleQuizTypeChange, startGame, handleMultipleChoiceChange,
     }) => {
 
     return (
@@ -51,12 +52,15 @@ const QuizInitialization = (
                 style={{ width: "100%" }}
             >
                 <option>Select quiz type</option>
-                <option value="all">All</option>
+                <option value="all">All words</option>
                 <option value="wrong">Top 10 wrong answers</option>
                 <option value="least_attempts">Least practiced words</option>
                 <option value="flagged">Flagged</option>
             </select>
 
+            <label className="mt-2 mb-2" htmlFor="multiple-choice">
+            <input id="multiple-choice" type="checkbox" onClick={handleMultipleChoiceChange}></input>
+              Multiple choice</label>
             <button onClick={startGame}>Start</button>
         </div>
     )

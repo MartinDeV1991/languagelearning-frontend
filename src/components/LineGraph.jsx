@@ -86,7 +86,7 @@ const LineGraph = ({ type, language1, language2 }) => {
 					data: data,
 					backgroundColor: "rgba(75, 192, 192, 0.3)",
 					borderColor: "rgb(75, 192, 192)",
-					borderWidth: 1
+					borderWidth: 5
 				},
 			],
 		});

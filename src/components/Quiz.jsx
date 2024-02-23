@@ -15,6 +15,9 @@ const Quiz = () => {
 	const [language1, setLanguage1] = useState("NL");
 	const [language2, setLanguage2] = useState("EN-GB");
 	const [quizType, setQuizType] = useState("all");
+	const [multipleChoice, setMultipleChoice] = useState(false);
+	const [choices, setChoices] = useState([]);
+	const [checking, setChecking] = useState(false);
 
 	const [input, setInput] = useState("");
 	const [output, setOutput] = useState("");
@@ -47,6 +50,26 @@ const Quiz = () => {
 		setHint1(false);
 		setHint2(false);
 		setHint3(false);
+
+		let multipleChoiceAnswers = [];
+		const answerList = answers;
+		multipleChoiceAnswers.push(answerList[currentQuestionIndex]);
+		let selectedIndices = new Set();
+
+		for (let i = 0; i < 3; i++) {
+			let index;
+			if (answers.length > 3) {
+				do {
+					index = Math.floor(Math.random() * answers.length);
+				} while (selectedIndices.has(index) || index === currentQuestionIndex);
+				selectedIndices.add(index);
+				multipleChoiceAnswers.push(answerList[index]);
+			} else {
+				index = Math.floor(Math.random() * answers.length);
+				multipleChoiceAnswers.push(answerList[index]);
+			}
+		}
+		setChoices(multipleChoiceAnswers);
 	}, [currentQuestionIndex, questions]);
 
 	const handleLanguage1Change = (e) => {
@@ -67,8 +90,32 @@ const Quiz = () => {
 		setInput(e.target.value);
 	};
 
+	const submitChoice = async (e) => {
+		setInput(e);
+		setChecking(true);
+	};
+
+	const submitAnswer = async (e) => {
+		e.preventDefault();
+		checkAnswer();
+	}
+
+	useEffect(() => {
+		console.log("input: ", input)
+		console.log("checking: ", checking)
+		if (checking) {
+			console.log("checking the answer")
+			checkAnswer();
+			setChecking(false);
+		}
+	}, [checking]);
+
 	const handleQuizTypeChange = (e) => {
 		setQuizType(e.target.value);
+	};
+
+	const handleMultipleChoiceChange = (e) => {
+		setMultipleChoice(e.target.checked);
 	};
 
 	const startGame = async () => {
@@ -123,18 +170,19 @@ const Quiz = () => {
 		} catch (error) {
 			console.log(error);
 		}
+
 	};
 
-	const checkAnswer = async (e) => {
-		e.preventDefault();
+	const checkAnswer = async () => {
 		setCorrect(false);
+		// console.log("input: ", input)
 		const userAnswer = input;
 		const wordId = wordIds[currentQuestionIndex];
 		if (
 			userAnswer.toLowerCase() === answers[currentQuestionIndex].toLowerCase()
 		) {
 			setCorrect(true);
-			if (currentQuestionIndex + 1 <= Math.min(questions.length, maxQuestions)) {
+			if (currentQuestionIndex < Math.min(questions.length, maxQuestions) - 1) {
 				setDisplayInput(false);
 				setFeedback(`You answered correctly: The answer was "${answers[currentQuestionIndex]}"`);
 				setTimeout(() => {
@@ -146,20 +194,20 @@ const Quiz = () => {
 			} else {
 				setFeedback("Congratulations! You completed the quiz.");
 				const today = new Date();
-					const year = today.getFullYear();
-					const month = (today.getMonth() + 1).toString().padStart(2, '0');
-					const day = today.getDate().toString().padStart(2, '0');
+				const year = today.getFullYear();
+				const month = (today.getMonth() + 1).toString().padStart(2, '0');
+				const day = today.getDate().toString().padStart(2, '0');
 
-					const formattedDateToday = `${year}-${month}-${day}`;
-					const logData = {
-						testType: "all",
-						sourceLanguage: language1,
-						targetLanguage: language2,
-						numberOfQuestions: 10,
-						numberOfCorrectAnswers: 9,
-						date: formattedDateToday
-					}
-					postData(`api/log/${user_id}`, logData);
+				const formattedDateToday = `${year}-${month}-${day}`;
+				const logData = {
+					testType: "all",
+					sourceLanguage: language1,
+					targetLanguage: language2,
+					numberOfQuestions: 10,
+					numberOfCorrectAnswers: 9,
+					date: formattedDateToday
+				}
+				postData(`api/log/${user_id}`, logData);
 				setInput("");
 				setDisplayInput(false);
 				setTimeout(() => setGameFinished(true), 3000);
@@ -167,7 +215,7 @@ const Quiz = () => {
 			await putData(`api/statistics/add_attempts/${wordId}`, true);
 		} else {
 			if (attempts >= 2) {
-				if (currentQuestionIndex + 1 <= Math.min(questions.length, maxQuestions)) {
+				if (currentQuestionIndex < Math.min(questions.length, maxQuestions) - 1) {
 					setFeedback(`You answered incorrectly: The answer was "${answers[currentQuestionIndex]}"`);
 					setTimeout(() => {
 						setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
@@ -218,24 +266,54 @@ const Quiz = () => {
 							</strong>
 						</div>
 
-						<Form onSubmit={checkAnswer} className="mb-5">
-							<div><strong>Question #{currentQuestionIndex + 1}</strong></div>
-							<div>Translate: <strong>{output}</strong></div>
-							<div style={{ color: correct === true ? "green" : "red", fontSize: "30px" }}>{feedback}</div>
+						<div><strong>Question #{currentQuestionIndex + 1}</strong></div>
+						<div>Translate: <strong>{output}</strong></div>
+						<div style={{ color: correct === true ? "green" : "red", fontSize: "30px" }}>{feedback}</div>
 
-							<Form.Group controlId="inputBox">
-								<Form.Control
-									type="text"
-									placeholder="Type your answer here"
-									value={input}
-									onChange={handleInputChange}
-									style={{ width: "300px", display: displayInput ? "block" : "none" }}
-								/>
-							</Form.Group>
-							<Button variant="primary" type="submit" style={{ display: displayInput ? "block" : "none" }}>
-								Submit
-							</Button>
-						</Form>
+						{!multipleChoice && (
+							<Form onSubmit={submitAnswer} className="mb-5">
+								<Form.Group controlId="inputBox">
+									<Form.Control
+										type="text"
+										placeholder="Type your answer here"
+										value={input}
+										onChange={handleInputChange}
+										style={{ width: "300px", display: displayInput ? "block" : "none" }}
+									/>
+								</Form.Group>
+								<Button variant="primary" type="submit" style={{ display: displayInput ? "block" : "none" }}>
+									Submit
+								</Button>
+							</Form>
+						)}
+						{multipleChoice && (
+							<div>
+								<button
+									type="button"
+									onClick={() => submitChoice(choices[0])}
+								>
+									{choices[0]}
+								</button>
+								<button
+									type="button"
+									onClick={() => submitChoice(choices[1])}
+								>
+									{choices[1]}
+								</button>
+								<button
+									type="button"
+									onClick={() => submitChoice(choices[2])}
+								>
+									{choices[2]}
+								</button>
+								<button
+									type="button"
+									onClick={() => submitChoice(choices[3])}
+								>
+									{choices[3]}
+								</button>
+							</div>
+						)}
 						<div>You have had {attempts} attempts for this question.</div>
 
 						<Button onClick={() => setHint1(!hint1)}>Hint 1</Button>
@@ -277,6 +355,7 @@ const Quiz = () => {
 					quizType={quizType}
 					handleQuizTypeChange={handleQuizTypeChange}
 					startGame={startGame}
+					handleMultipleChoiceChange={handleMultipleChoiceChange}
 				/>}
 
 			<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
