@@ -1,13 +1,18 @@
 import Statistics from 'components/Statistics';
 import Graph from 'components/Graph';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Dropdown } from "react-bootstrap";
+import { fetchData, putData } from "utils/api";
 
 export default function StatisticsPage() {
 
 	const [sourceLanguage, setSourceLanguage] = useState('all');
 	const [translatedTo, setTranslatedTo] = useState('all');
 	const [partOfSpeech, setPartOfSpeech] = useState('all');
+
+	const [data, setData] = useState([]);
+
+	let user_id = localStorage.getItem("languagelearning_id");
 
 	const handleSourceLanguageChange = (event) => {
 		setSourceLanguage(event);
@@ -20,6 +25,15 @@ export default function StatisticsPage() {
 	const handlePartOfSpeechChange = (event) => {
 		setPartOfSpeech(event);
 	};
+
+	async function fetchStats() {
+		const data = await fetchData(`api/word/user/${user_id}`);		
+		setData(data);
+	}
+
+	useEffect(() => {
+		fetchStats();
+	}, []);
 
 	return (
 		<Container className="mt-4">
@@ -73,10 +87,10 @@ export default function StatisticsPage() {
 
 				</div>
 
-				<Graph type="correct" language1={sourceLanguage} language2={translatedTo} speechType={partOfSpeech} />
-				<Graph type="attempt" language1={sourceLanguage} language2={translatedTo} speechType={partOfSpeech} />
+				<Graph type="correct" language1={sourceLanguage} language2={translatedTo} speechType={partOfSpeech} data={data} />
+				<Graph type="attempt" language1={sourceLanguage} language2={translatedTo} speechType={partOfSpeech} data={data} />
 			</div>
-			<Statistics />
+			<Statistics data={data} />
 			<div className='mb-5'></div>
 		</Container>
 	)

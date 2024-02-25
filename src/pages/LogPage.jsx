@@ -1,24 +1,30 @@
 import LineGraph from 'components/LineGraph';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Dropdown } from "react-bootstrap";
+import { fetchData } from 'utils/api';
 
 export default function LogPage() {
+	let user_id = localStorage.getItem("languagelearning_id");
 
 	const [sourceLanguage, setSourceLanguage] = useState('all');
 	const [translatedTo, setTranslatedTo] = useState('all');
 	const [partOfSpeech, setPartOfSpeech] = useState('all');
-
-	const handleSourceLanguageChange = (event) => {
-		setSourceLanguage(event);
-	};
-
-	const handleTranslatedLanguageChange = (event) => {
-		setTranslatedTo(event);
-	};
+	const [data, setData] = useState([]);
 
 	const handlePartOfSpeechChange = (event) => {
 		setPartOfSpeech(event);
 	};
+
+	async function loadStats() {
+		const data = await fetchData(`api/user/${user_id}`);
+		if (data && data.hasOwnProperty('log')) {
+			setData(data.log);
+		}
+	}
+
+	useEffect(() => {
+		loadStats();
+	}, []);
 
 	return (
 		<Container className="mt-4">
@@ -26,7 +32,7 @@ export default function LogPage() {
 
 			<div className="mb-5" style={{ display: 'flex', justifyContent: 'space-between' }}>
 				<div>
-					<Dropdown onSelect={handleSourceLanguageChange}>
+					<Dropdown onSelect={(event) => setSourceLanguage(event)}>
 						<Dropdown.Toggle variant="secondary" id="dropdown-basic">
 							{sourceLanguage === "all" ? "All source languages" : sourceLanguage}
 						</Dropdown.Toggle>
@@ -41,7 +47,7 @@ export default function LogPage() {
 						</Dropdown.Menu>
 					</Dropdown>
 
-					<Dropdown onSelect={handleTranslatedLanguageChange}>
+					<Dropdown onSelect={(event) => setTranslatedTo(event)}>
 						<Dropdown.Toggle variant="secondary" id="dropdown-basic">
 							{translatedTo === "all" ? "All target languages" : translatedTo}
 						</Dropdown.Toggle>
@@ -58,8 +64,8 @@ export default function LogPage() {
 
 				</div>
 
-				<LineGraph type="correct" language1={sourceLanguage} language2={translatedTo} />
-				<LineGraph type="tries" language1={sourceLanguage} language2={translatedTo} />
+				<LineGraph type="correct" language1={sourceLanguage} language2={translatedTo} data = {data} />
+				<LineGraph type="tries" language1={sourceLanguage} language2={translatedTo} data = {data}/>
 			</div>
 			<div className='mb-5'></div>
 		</Container>
