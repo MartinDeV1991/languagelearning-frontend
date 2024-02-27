@@ -226,7 +226,12 @@ export default function WordTable() {
 			editable: false,
 			cellRenderer: RootWordOffCanvas,
 		},
-		{ field: "book", headerName: "Book", valueFormatter: bookFormatter },
+		{
+			field: "book",
+			headerName: "Book",
+			valueFormatter: bookFormatter,
+			editable: false,
+		},
 		{
 			field: "statistics.flag",
 			headerName: "Flag",

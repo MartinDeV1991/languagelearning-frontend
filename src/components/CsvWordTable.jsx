@@ -1,49 +1,15 @@
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-balham.css"; // Theme
-import React, { useEffect, useMemo, useState } from "react";
-import Papa from "papaparse";
+import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { postData } from "utils/api";
 
 export default function CsvWordTable({ csvData }) {
 	const gridRef = React.useRef(null);
-	const [rowData, setRowData] = useState([]);
-	const user_id = 1;
+	const [rowData, setRowData] = useState(csvData);
+	const user_id = localStorage.getItem("languagelearning_id");
 	const [selectedWords, setSelectedWords] = useState([]);
-
-	const convertCSV = async (csv) => {
-		const data = Papa.parse(csv, {
-			header: true,
-		});
-		setRowData(convertToWordArray(data.data));
-	};
-
-	const convertToWordArray = (data) => {
-		const wordArray = [];
-		data.forEach((row) => {
-			const word = {
-				word: row.word,
-				rootWord: row.stem,
-				contextSentence: row.usage,
-				sourceLanguage: row.lang,
-				translatedTo: "EN-GB",
-				book: {
-					title: row.title,
-					author: row.authors,
-					language: row.lang,
-					isbn: row.isbn,
-				},
-			};
-			wordArray.push(word);
-		});
-		console.log(wordArray);
-		return wordArray;
-	};
-
-	useMemo(() => {
-		convertCSV(csvData);
-	}, [csvData]);
 
 	const columnDefs = [
 		{
