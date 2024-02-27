@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { postData } from "utils/api";
 import { toast } from "react-toastify";
 import CsvWordTable from "./CsvWordTable";
+import Papa from "papaparse";
 
 export default function UploadCSV() {
-	let user_id = localStorage.getItem("languagelearning_id");
 	const sourceLanguage = "NL";
 	const translatedTo = "EN-GB";
 	const [file, setFile] = useState(null);
 	const [uploading, setUploading] = useState(false);
-	const [data, setData] = useState("");
+	const [data, setData] = useState([]);
 
 	const handleFileChange = (e) => {
 		if (e.target.files) {
@@ -31,30 +30,31 @@ export default function UploadCSV() {
 		}
 	};
 
+	const convertCSV = async (csv) => {
+		const data = Papa.parse(csv, {
+			header: true,
+		});
+		setData(convertToWordArray(data.data));
+		return data.data;
+	};
+
 	async function accessCsvContents(file) {
 		const reader = new FileReader();
 
-		reader.onload = function (e) {
+		reader.onload = async function (e) {
 			console.log(e);
 			const textContents = e.target.result;
-			setData(textContents.toString()); // Setting data to contents of csv file
-			console.log("CSV file contents:", textContents);
+			console.log("CSV file contents: ", textContents);
+			const parsedCsvData = await convertCSV(textContents.toString()); // converting csv to JSON
+			setData(convertToWordArray(parsedCsvData)); // Setting data to word array from JSON
+			console.log("Parsed CSV data: ", parsedCsvData);
 		};
 
 		// Read the file as text
 		reader.readAsText(file);
 	}
 
-	const addWords = async (words) => {
-		console.log(words);
-		try {
-			postData(`api/word/user/${user_id}/multiple`, words);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const convertToWordArray = async (data) => {
+	const convertToWordArray = (data) => {
 		const wordArray = [];
 		data.forEach((row) => {
 			const word = {
@@ -70,7 +70,7 @@ export default function UploadCSV() {
 			};
 			wordArray.push(word);
 		});
-		console.log(wordArray);
+		console.log("Word array: ", wordArray);
 		return wordArray;
 	};
 
@@ -99,7 +99,7 @@ export default function UploadCSV() {
 						</Button>
 					</Col>
 				</Row>
-				{data && (
+				{data.length > 0 && (
 					<Row className="justify-items-between">
 						<Col>
 							<h4>Select words to import</h4>
