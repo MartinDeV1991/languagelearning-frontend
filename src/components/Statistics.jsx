@@ -5,16 +5,13 @@ import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
 
 import { toast } from "react-toastify";
-import { fetchData, putData } from "utils/api";
+import { putData } from "utils/api";
 
-const Statistics = () => {
-	let user_id = localStorage.getItem("languagelearning_id");
-
+const Statistics = ({ data }) => {
 	const getRowId = (params) => params.data.id;
+	const rowData = data;
 
 	const [quickFilterText, setQuickFilterText] = useState("");
-
-	const [rowData, setRowData] = useState([]);
 	const [colDefs] = useState([
 		{ field: "sourceLanguage", headerName: "📖", width: 80, editable: false },
 		{ field: "translatedTo", headerName: "📖", width: 80, editable: false },
@@ -48,16 +45,6 @@ const Statistics = () => {
 		[]
 	);
 
-	async function fetchStats() {
-		const rowData = await fetchData(`api/word/user/${user_id}`);
-		setRowData(await rowData);
-	}
-
-	useEffect(() => {
-		fetchStats();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
 	const handleCellValueChanged = async (event) => {
 		const rowId = event.data.id;
 		const flag = event.value;
@@ -72,18 +59,13 @@ const Statistics = () => {
 		}
 	};
 
-	const handleSearchChange = (event) => {
-		const searchText = event.target.value;
-		setQuickFilterText(searchText);
-	};
-
 	return (
 		<>
 			<Form.Control
 				type="text"
 				placeholder="Search"
 				value={quickFilterText}
-				onChange={handleSearchChange}
+				onChange={(event) => setQuickFilterText(event.target.value)}
 				className="mb-2"
 			/>
 

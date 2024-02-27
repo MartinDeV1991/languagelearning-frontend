@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Dropdown } from "react-bootstrap";
 import { Line } from "react-chartjs-2";
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 
 import { compareDesc } from "date-fns";
-import { fetchData } from "utils/api";
 
 Chart.register(CategoryScale);
 
-const LineGraph = ({ type, language1, language2 }) => {
-	let user_id = localStorage.getItem("languagelearning_id");
-
+const LineGraph = ({ type, language1, language2, data }) => {
 	const sourceLanguage = language1;
 	const translatedTo = language2;
-
-	const [rowData, setRowData] = useState([]);
+	const rowData = data;
 
 	const [chartData, setChartData] = useState({
 		labels: [],
@@ -36,7 +31,6 @@ const LineGraph = ({ type, language1, language2 }) => {
 	}
 
 	const updateChart = async () => {
-		console.log("data: ", rowData)
 		const filteredData = rowData.filter((item) =>
 			(sourceLanguage === 'all' || item.sourceLanguage === sourceLanguage) &&
 			(translatedTo === 'all' || item.targetLanguage === translatedTo));
@@ -92,19 +86,11 @@ const LineGraph = ({ type, language1, language2 }) => {
 		});
 	};
 
-	async function loadStats() {
-		const data = await fetchData(`api/user/${user_id}`);
-		setRowData(data.log);
-		console.log("updating");
-	}
-
 	useEffect(() => {
-		loadStats();
-	}, []);
-
-	useEffect(() => {
-		updateChart();
-	}, [user_id, type, translatedTo, sourceLanguage, rowData]);
+		if (rowData) {
+			updateChart();
+		}
+	}, [type, translatedTo, sourceLanguage, rowData]);
 
 	return (
 		<div

@@ -6,7 +6,8 @@ const BASE_URL = process.env.REACT_APP_PATH;
 // Common headers, if any, can be defined here
 const headers = {
 	"Content-Type": "application/json",
-	// Include other headers like authorization if needed
+	Authorization: localStorage.getItem('languagelearning_token'),
+	userId: localStorage.getItem('languagelearning_id'),
 };
 
 // GET requests (they provide own error handling and toast)

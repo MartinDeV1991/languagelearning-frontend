@@ -4,23 +4,15 @@ import { Bar } from "react-chartjs-2";
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 
-import { fetchData } from "utils/api";
-
 Chart.register(CategoryScale);
 
-const Graph = ({ type, language1, language2, speechType }) => {
-	let user_id = localStorage.getItem("languagelearning_id");
-
+const Graph = ({ type, language1, language2, speechType, data }) => {
+	const rowData = data;
 	const sourceLanguage = language1;
 	const translatedTo = language2;
 	const partOfSpeech = speechType;
 
-	const [rowData, setRowData] = useState([]);
 	const [sortingOrder, setSortingOrder] = useState("normal");
-
-	const handleSortingChange = (event) => {
-		setSortingOrder(event);
-	};
 
 	const [chartData, setChartData] = useState({
 		labels: [],
@@ -36,7 +28,6 @@ const Graph = ({ type, language1, language2, speechType }) => {
 	});
 
 	const updateChart = async () => {
-		console.log()
 		const filteredData = rowData.filter((item) =>
 			(sourceLanguage === 'all' || item.sourceLanguage === sourceLanguage) &&
 			(translatedTo === 'all' || item.translatedTo === translatedTo) &&
@@ -80,27 +71,18 @@ const Graph = ({ type, language1, language2, speechType }) => {
 		});
 	};
 
-	async function loadStats() {
-		const data = await fetchData(`api/word/user/${user_id}`);
-		setRowData(data);
-
-		console.log("updating");
-	}
-
 	useEffect(() => {
-		loadStats();
-	}, []);
-
-	useEffect(() => {
-		updateChart();
-	}, [user_id, type, translatedTo, sourceLanguage, partOfSpeech, sortingOrder, rowData]);
+		if (rowData) {
+			updateChart();
+		}
+	}, [type, translatedTo, sourceLanguage, partOfSpeech, sortingOrder, rowData]);
 
 	return (
 		<div
 			className="chart-container mb-5"
 			style={{ width: "800px", height: "300px" }}
 		>
-			<Dropdown onSelect={handleSortingChange}>
+			<Dropdown onSelect={(event) => setSortingOrder(event)}>
 				<Dropdown.Toggle variant="primary" id="dropdown-basic">
 					Sorted: {sortingOrder}
 				</Dropdown.Toggle>
