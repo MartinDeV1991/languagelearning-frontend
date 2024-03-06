@@ -185,82 +185,83 @@ const Quiz = () => {
 
 	return (
 		<Container className="mt-4">
-			<h1>Quiz Game with Hints</h1>
+			<div style={{width: '50%'}}>
+				<h1>Quiz Game with Hints</h1>
+				<div style={{ color: correct === true ? "green" : "red", fontSize: "30px", display: !gameFinished ? "none" : "block" }}>{feedback}</div>
+				{gameStarted &&
+					!gameFinished && (
+						<div>
+							<div className="mb-3">
+								<strong>{language1}</strong>{" "}
+								to{" "}
+								<strong>{language2}</strong>
+							</div>
 
-			<div style={{ color: correct === true ? "green" : "red", fontSize: "30px", display: !gameFinished ? "none" : "block" }}>{feedback}</div>
-			{gameStarted &&
-				!gameFinished && (
-					<div>
-						<div className="mb-3">
-							<strong>{language1}</strong>{" "}
-							to{" "}
-							<strong>{language2}</strong>
+							<div style={{ display: displayInput ? "block" : "none" }}>
+								<div><strong>Question #{currentQuestionIndex + 1}</strong></div>
+								<div>Translate: <strong>{output}</strong></div>
+							</div>
+							<div style={{ color: correct === true ? "green" : "red", fontSize: "30px", display: displayInput ? "none" : "block" }}>{feedback}</div>
+
+							{displayInput && (
+								<>
+									{!multipleChoice && (
+										<Form onSubmit={submitAnswer} className="mb-5">
+											<Form.Group controlId="inputBox">
+												<Form.Control
+													type="text"
+													placeholder="Type your answer here"
+													onChange={handleInputChange}
+													style={{ width: "300px", display: displayInput ? "block" : "none" }}
+												/>
+											</Form.Group>
+											<Button variant="primary" type="submit">
+												Submit
+											</Button>
+										</Form>
+									)}
+									{multipleChoice && (
+										<div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'start', width: '20%' }}>
+											{choices.map((choice, index) => (
+												<button
+													key={index}
+													type="button"
+													onClick={() => checkAnswer(choice)}
+													style={{ width: '100%', height: '50px', margin: '0', padding: '0', backgroundColor: 'rgb(0, 200, 250, 1)' }}
+												>
+													{choice}
+												</button>
+											))}
+										</div>
+									)}
+									<div>You have had {attempts} attempts for this question.</div>
+									<Hints
+										answers={answers}
+										sentenceOriginal={sentenceOriginal}
+										sentenceTranslated={sentenceTranslated}
+										currentQuestionIndex={currentQuestionIndex}
+									/>
+								</>
+							)}
 						</div>
-
-						<div style={{ display: displayInput ? "block" : "none" }}>
-							<div><strong>Question #{currentQuestionIndex + 1}</strong></div>
-							<div>Translate: <strong>{output}</strong></div>
-						</div>
-						<div style={{ color: correct === true ? "green" : "red", fontSize: "30px", display: displayInput ? "none" : "block" }}>{feedback}</div>
-
-						{displayInput && (
-							<>
-								{!multipleChoice && (
-									<Form onSubmit={submitAnswer} className="mb-5">
-										<Form.Group controlId="inputBox">
-											<Form.Control
-												type="text"
-												placeholder="Type your answer here"
-												onChange={handleInputChange}
-												style={{ width: "300px", display: displayInput ? "block" : "none" }}
-											/>
-										</Form.Group>
-										<Button variant="primary" type="submit">
-											Submit
-										</Button>
-									</Form>
-								)}
-								{multipleChoice && (
-									<div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'start', width: '20%' }}>
-										{choices.map((choice, index) => (
-											<button
-												key={index}
-												type="button"
-												onClick={() => checkAnswer(choice)}
-												style={{ width: '100%', height: '50px', margin: '0', padding: '0', backgroundColor: 'rgb(0, 200, 250, 1)' }}
-											>
-												{choice}
-											</button>
-										))}
-									</div>
-								)}
-								<div>You have had {attempts} attempts for this question.</div>
-								<Hints
-									answers={answers}
-									sentenceOriginal={sentenceOriginal}
-									sentenceTranslated={sentenceTranslated}
-									currentQuestionIndex={currentQuestionIndex}
-								/>
-							</>
-						)}
-					</div>
-				)}{" "}
-			{currentQuestionIndex > 0 && !gameFinished && (
-				<Button onClick={restartQuiz}>Restart</Button>
-			)}
-			{!gameStarted &&
-				<QuizInitialization
-					language1={language1}
-					language2={language2}
-					quizType={quizType}
-					startGame={startGame}
-					handleLanguage1Change={(e) => setLanguage1(e.target.value)}
-					handleLanguage2Change={(e) => setLanguage2(e.target.value)}
-					handleQuizTypeChange={(e) => setQuizType(e.target.value)}
-					handleMultipleChoiceChange={(e) => setMultipleChoice(e.target.checked)}
-				/>}
-			<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
-		</Container>
+					)}{" "}
+				{currentQuestionIndex > 0 && !gameFinished && (
+					<Button onClick={restartQuiz}>Restart</Button>
+				)}
+			</div>
+				{!gameStarted &&
+					<QuizInitialization
+						language1={language1}
+						language2={language2}
+						quizType={quizType}
+						startGame={startGame}
+						handleLanguage1Change={(e) => setLanguage1(e.target.value)}
+						handleLanguage2Change={(e) => setLanguage2(e.target.value)}
+						handleQuizTypeChange={(e) => setQuizType(e.target.value)}
+						handleMultipleChoiceChange={(e) => setMultipleChoice(e.target.checked)}
+					/>}
+				<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
+		</Container >
 	);
 };
 
