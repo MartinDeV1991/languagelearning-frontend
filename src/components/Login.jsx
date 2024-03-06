@@ -30,10 +30,10 @@ const Login = () => {
 			console.log("succesvol ingelogd");
 			console.log(data.success);
 			if (data.status !== 404) {
-				localStorage.setItem("languagelearning_token", data.token);
-				localStorage.setItem("languagelearning_first_name", data.firstName);
-				localStorage.setItem("languagelearning_last_name", data.lastName);
-				localStorage.setItem("languagelearning_id", data.id);
+				localStorage.setItem("languagelearning_token", data[1]);
+				localStorage.setItem("languagelearning_first_name", data[0].firstName);
+				localStorage.setItem("languagelearning_last_name", data[0].lastName);
+				localStorage.setItem("languagelearning_id", data[0].id);
 				navigate(`/`);
 			} else {
 				localStorage.setItem("languagelearning_id", "1");
