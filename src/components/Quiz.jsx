@@ -39,34 +39,32 @@ const Quiz = () => {
 	const [wordIds, setWordIds] = useState([]);
 	const [attempts, setAttempts] = useState(0);
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
+		function determineMultipleChoiceOptions() {
+			let multipleChoiceAnswers = [];
+			const answerList = answers;
+			let selectedIndices = new Set();
+
+			multipleChoiceAnswers.push(answerList[currentQuestionIndex]);
+			for (let i = 0; i < 3; i++) {
+				let index;
+				if (answers.length > 3) {
+					do {
+						index = Math.floor(Math.random() * answers.length);
+					} while (selectedIndices.has(index) || index === currentQuestionIndex);
+					selectedIndices.add(index);
+					multipleChoiceAnswers.push(answerList[index]);
+				} else {
+					index = Math.floor(Math.random() * answers.length);
+					multipleChoiceAnswers.push(answerList[index]);
+				}
+			}
+			setChoices(multipleChoiceAnswers);
+		}
 		setQuestion(questions[currentQuestionIndex]);
 		setInput("");
 		determineMultipleChoiceOptions();
-	}, [currentQuestionIndex, questions,]);
-
-	function determineMultipleChoiceOptions() {
-		let multipleChoiceAnswers = [];
-		const answerList = answers;
-		let selectedIndices = new Set();
-
-		multipleChoiceAnswers.push(answerList[currentQuestionIndex]);
-		for (let i = 0; i < 3; i++) {
-			let index;
-			if (answers.length > 3) {
-				do {
-					index = Math.floor(Math.random() * answers.length);
-				} while (selectedIndices.has(index) || index === currentQuestionIndex);
-				selectedIndices.add(index);
-				multipleChoiceAnswers.push(answerList[index]);
-			} else {
-				index = Math.floor(Math.random() * answers.length);
-				multipleChoiceAnswers.push(answerList[index]);
-			}
-		}
-		setChoices(multipleChoiceAnswers);
-	}
+	}, [currentQuestionIndex, questions, answers]);
 
 	const restartQuiz = () => {
 		setCurrentQuestionIndex(0);
