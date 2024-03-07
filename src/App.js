@@ -16,7 +16,6 @@ import Footer from "partials/Footer";
 import { ToastContainer } from "react-toastify";
 import MyBooksPage from "pages/MyBooksPage";
 import ImportPage from "pages/ImportPage";
-import { Container } from "react-bootstrap";
 
 function App() {
 	return (

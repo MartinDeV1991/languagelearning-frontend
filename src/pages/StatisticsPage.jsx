@@ -2,7 +2,7 @@ import Statistics from 'components/Statistics';
 import Graph from 'components/Graph';
 import React, { useState, useEffect } from "react";
 import { Container, Dropdown } from "react-bootstrap";
-import { fetchData, putData } from "utils/api";
+import { fetchData } from "utils/api";
 
 export default function StatisticsPage() {
 
@@ -27,10 +27,11 @@ export default function StatisticsPage() {
 	};
 
 	async function fetchStats() {
-		const data = await fetchData(`api/word/user/${user_id}`);		
+		const data = await fetchData(`api/word/user/${user_id}`);
 		setData(data);
 	}
-
+	
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		fetchStats();
 	}, []);

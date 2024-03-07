@@ -85,7 +85,7 @@ const LineGraph = ({ type, language1, language2, data }) => {
 			],
 		});
 	};
-
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		if (rowData) {
 			updateChart();

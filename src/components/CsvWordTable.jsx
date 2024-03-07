@@ -11,6 +11,8 @@ export default function CsvWordTable({ csvData }) {
 	const user_id = localStorage.getItem("languagelearning_id");
 	const [selectedWords, setSelectedWords] = useState([]);
 
+	setRowData(csvData);
+
 	const columnDefs = [
 		{
 			headerName: "📖",
@@ -51,7 +53,7 @@ export default function CsvWordTable({ csvData }) {
 	const onSelectionChanged = (event) => {
 		const selectedNodes = event.api.getSelectedNodes();
 		const selectedWordObjects = [];
-		selectedNodes.map((node) => {
+		selectedNodes.forEach((node) => {
 			selectedWordObjects.push(node.data);
 		});
 		setSelectedWords(selectedWordObjects);
