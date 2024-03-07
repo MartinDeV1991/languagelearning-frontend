@@ -16,7 +16,7 @@ export default function LogPage() {
 			setData(data.log);
 		}
 	}
-
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		loadStats();
 	}, []);
@@ -59,8 +59,8 @@ export default function LogPage() {
 
 				</div>
 
-				<LineGraph type="correct" language1={sourceLanguage} language2={translatedTo} data = {data} />
-				<LineGraph type="tries" language1={sourceLanguage} language2={translatedTo} data = {data}/>
+				<LineGraph type="correct" language1={sourceLanguage} language2={translatedTo} data={data} />
+				<LineGraph type="tries" language1={sourceLanguage} language2={translatedTo} data={data} />
 			</div>
 			<div className='mb-5'></div>
 		</Container>

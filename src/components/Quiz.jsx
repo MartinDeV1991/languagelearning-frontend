@@ -39,11 +39,12 @@ const Quiz = () => {
 	const [wordIds, setWordIds] = useState([]);
 	const [attempts, setAttempts] = useState(0);
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		setQuestion(questions[currentQuestionIndex]);
 		setInput("");
 		determineMultipleChoiceOptions();
-	}, [currentQuestionIndex, questions]);
+	}, [currentQuestionIndex, questions,]);
 
 	function determineMultipleChoiceOptions() {
 		let multipleChoiceAnswers = [];

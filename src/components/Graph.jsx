@@ -105,7 +105,7 @@ const Graph = ({ type, language1, language2, speechType, data }) => {
 			],
 		});
 	};
-
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		if (rowData) {
 			updateChart();

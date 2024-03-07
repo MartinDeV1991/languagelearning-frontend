@@ -1,8 +1,6 @@
 import React from "react";
 
 import "./quiz.css";
-import { Scale } from "chart.js";
-
 
 const QuizInitialization = (
     { language1, language2, handleLanguage1Change, handleLanguage2Change,
