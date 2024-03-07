@@ -26,15 +26,13 @@ export default function StatisticsPage() {
 		setPartOfSpeech(event);
 	};
 
-	async function fetchStats() {
-		const data = await fetchData(`api/word/user/${user_id}`);
-		setData(data);
-	}
-	
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
+		async function fetchStats() {
+			const data = await fetchData(`api/word/user/${user_id}`);
+			setData(data);
+		}
 		fetchStats();
-	}, []);
+	}, [user_id]);
 
 	return (
 		<Container className="mt-4">

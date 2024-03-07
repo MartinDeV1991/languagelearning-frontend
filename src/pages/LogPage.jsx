@@ -10,16 +10,15 @@ export default function LogPage() {
 	const [translatedTo, setTranslatedTo] = useState('all');
 	const [data, setData] = useState([]);
 
-	async function loadStats() {
-		const data = await fetchData(`api/user/${user_id}`);
-		if (data && data.hasOwnProperty('log')) {
-			setData(data.log);
-		}
-	}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
+		async function loadStats() {
+			const data = await fetchData(`api/user/${user_id}`);
+			if (data && data.hasOwnProperty('log')) {
+				setData(data.log);
+			}
+		}
 		loadStats();
-	}, []);
+	}, [user_id]);
 
 	return (
 		<Container className="mt-4">

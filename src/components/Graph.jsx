@@ -34,79 +34,78 @@ const Graph = ({ type, language1, language2, speechType, data }) => {
 		setNumberToDisplay(eventKey);
 	};
 
-	const updateChart = async () => {
-		const filteredData = rowData.filter((item) =>
-			(sourceLanguage === 'all' || item.sourceLanguage === sourceLanguage) &&
-			(translatedTo === 'all' || item.translatedTo === translatedTo) &&
-			(partOfSpeech === 'all' || item.rootWord.partOfSpeech === partOfSpeech));
-
-		// const dataWithLabels = filteredData.map((item) => ({
-		// 	label: item.word,
-		// 	data: item.statistics
-		// 		? type === "correct"
-		// 			? item.statistics.guessedCorrectly
-		// 			: item.statistics.attempts
-		// 		: 0,
-		// }));
-		const groupedData = filteredData.reduce((acc, item) => {
-			const rootWord = item.rootWord.word;
-			if (!acc[rootWord]) {
-				acc[rootWord] = {
-					rootWord: rootWord,
-					guessedCorrectly: 0,
-					attempts: 0
-				};
-			}
-
-			if (item.statistics) {
-				if (type === "correct") {
-					acc[rootWord].guessedCorrectly += item.statistics.guessedCorrectly || 0;
-				} else {
-					acc[rootWord].attempts += item.statistics.attempts || 0;
-				}
-			}
-
-			return acc;
-		}, {});
-
-		const dataWithLabels = Object.values(groupedData).map(item => ({
-			label: item.rootWord,
-			data: type === "correct" ? item.guessedCorrectly : item.attempts
-		}));
-
-		if (sortingOrder === "highest") {
-			dataWithLabels.sort((a, b) => b.data - a.data);
-		} else if (sortingOrder === "lowest") {
-			dataWithLabels.sort((a, b) => a.data - b.data);
-		}
-
-		setNumbers(Array.from({ length: dataWithLabels.length }, (_, index) => index + 1));
-
-		let slicedData = dataWithLabels.slice(0, numberToDisplay);
-		const labels = slicedData.map((item) => item.label);
-		const data = slicedData.map((item) => item.data);
-
-		setChartData({
-			labels: labels,
-			datasets: [
-				{
-					label: type === "correct"
-						? "Number of Correct Guesses"
-						: "Number of Total Attempts",
-					data: data,
-					backgroundColor: type === "correct"
-						? "rgba(75, 192, 192, 0.3)"
-						: "rgba(54, 162, 235, 0.3)",
-					borderColor: type === "correct"
-						? "rgb(75, 192, 192)"
-						: "rgb(54, 162, 235)",
-					borderWidth: 1
-				},
-			],
-		});
-	};
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
+		const updateChart = async () => {
+			const filteredData = rowData.filter((item) =>
+				(sourceLanguage === 'all' || item.sourceLanguage === sourceLanguage) &&
+				(translatedTo === 'all' || item.translatedTo === translatedTo) &&
+				(partOfSpeech === 'all' || item.rootWord.partOfSpeech === partOfSpeech));
+
+			// const dataWithLabels = filteredData.map((item) => ({
+			// 	label: item.word,
+			// 	data: item.statistics
+			// 		? type === "correct"
+			// 			? item.statistics.guessedCorrectly
+			// 			: item.statistics.attempts
+			// 		: 0,
+			// }));
+			const groupedData = filteredData.reduce((acc, item) => {
+				const rootWord = item.rootWord.word;
+				if (!acc[rootWord]) {
+					acc[rootWord] = {
+						rootWord: rootWord,
+						guessedCorrectly: 0,
+						attempts: 0
+					};
+				}
+
+				if (item.statistics) {
+					if (type === "correct") {
+						acc[rootWord].guessedCorrectly += item.statistics.guessedCorrectly || 0;
+					} else {
+						acc[rootWord].attempts += item.statistics.attempts || 0;
+					}
+				}
+
+				return acc;
+			}, {});
+
+			const dataWithLabels = Object.values(groupedData).map(item => ({
+				label: item.rootWord,
+				data: type === "correct" ? item.guessedCorrectly : item.attempts
+			}));
+
+			if (sortingOrder === "highest") {
+				dataWithLabels.sort((a, b) => b.data - a.data);
+			} else if (sortingOrder === "lowest") {
+				dataWithLabels.sort((a, b) => a.data - b.data);
+			}
+
+			setNumbers(Array.from({ length: dataWithLabels.length }, (_, index) => index + 1));
+
+			let slicedData = dataWithLabels.slice(0, numberToDisplay);
+			const labels = slicedData.map((item) => item.label);
+			const data = slicedData.map((item) => item.data);
+
+			setChartData({
+				labels: labels,
+				datasets: [
+					{
+						label: type === "correct"
+							? "Number of Correct Guesses"
+							: "Number of Total Attempts",
+						data: data,
+						backgroundColor: type === "correct"
+							? "rgba(75, 192, 192, 0.3)"
+							: "rgba(54, 162, 235, 0.3)",
+						borderColor: type === "correct"
+							? "rgb(75, 192, 192)"
+							: "rgb(54, 162, 235)",
+						borderWidth: 1
+					},
+				],
+			});
+		};
 		if (rowData) {
 			updateChart();
 		}
