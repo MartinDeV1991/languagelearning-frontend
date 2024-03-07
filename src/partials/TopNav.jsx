@@ -3,6 +3,9 @@ import { Container, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 
 export default function TopNav() {
+
+	const name = localStorage.getItem("languagelearning_first_name");
+	const nameVar = name + `'s account`;
 	return (
 		<Navbar bg="primary" data-bs-theme="dark">
 			<Container>
@@ -26,7 +29,7 @@ export default function TopNav() {
 				</Nav>
 				<Nav className="ms-auto">
 					<NavDropdown
-						title="My account"
+						title= {nameVar}
 						id="basic-nav-dropdown"
 						align="end"
 						data-bs-theme="light"

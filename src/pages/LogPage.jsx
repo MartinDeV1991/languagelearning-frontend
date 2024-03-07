@@ -8,12 +8,7 @@ export default function LogPage() {
 
 	const [sourceLanguage, setSourceLanguage] = useState('all');
 	const [translatedTo, setTranslatedTo] = useState('all');
-	const [partOfSpeech, setPartOfSpeech] = useState('all');
 	const [data, setData] = useState([]);
-
-	const handlePartOfSpeechChange = (event) => {
-		setPartOfSpeech(event);
-	};
 
 	async function loadStats() {
 		const data = await fetchData(`api/user/${user_id}`);
