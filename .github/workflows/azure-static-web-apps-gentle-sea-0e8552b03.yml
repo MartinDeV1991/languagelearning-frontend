@@ -15,14 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
+      - name: Set Environment Variables
+        run:
+          echo "REACT_APP_PATH=${{ secrets.REACT_APP_PATH }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
-      - name: Build
-        run: |
-          npm install  # Install dependencies
-          npm run build  # Build your application
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
