@@ -110,7 +110,7 @@ const Graph = ({ type, language1, language2, speechType, data }) => {
 		if (rowData) {
 			updateChart();
 		}
-	}, [type, translatedTo, sourceLanguage, partOfSpeech, sortingOrder, rowData, numberToDisplay, updateChart]);
+	}, [type, translatedTo, sourceLanguage, partOfSpeech, sortingOrder, rowData, numberToDisplay]);
 
 	return (
 		<div
