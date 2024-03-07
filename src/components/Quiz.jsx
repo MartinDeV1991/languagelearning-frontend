@@ -21,7 +21,7 @@ const Quiz = () => {
 	const [correctCounter, setCorrectCounter] = useState(0);
 
 	const [input, setInput] = useState("");
-	const [output, setOutput] = useState("");
+	const [question, setQuestion] = useState("");
 	const [feedback, setFeedback] = useState("");
 	const [correct, setCorrect] = useState(false);
 	const [displayInput, setDisplayInput] = useState(true);
@@ -40,7 +40,7 @@ const Quiz = () => {
 	const [attempts, setAttempts] = useState(0);
 
 	useEffect(() => {
-		setOutput(questions[currentQuestionIndex]);
+		setQuestion(questions[currentQuestionIndex]);
 		setInput("");
 		determineMultipleChoiceOptions();
 	}, [currentQuestionIndex, questions]);
@@ -88,7 +88,7 @@ const Quiz = () => {
 			let filteredData;
 			const languageFilteredData = data.filter(
 				(item) =>
-					item.sourceLanguage === language1 && item.translatedTo === language2
+					(item.sourceLanguage === language1 || item.sourceLanguage === language2) && (item.translatedTo === language2 || item.translatedTo === language1)
 			);
 
 			if (quizType === "wrong") {
@@ -120,8 +120,24 @@ const Quiz = () => {
 			}
 
 			setWordIds(filteredData.map(({ id }) => id));
-			setQuestions(filteredData.map(({ word }) => word));
-			setAnswers(filteredData.map(({ translation }) => translation));
+
+			const wordsInLanguage1 = filteredData.map(({ translation, word, sourceLanguage, translatedTo }) => {
+				if (sourceLanguage === language2 && translatedTo === language1) {
+					return word;
+				}
+				return translation;
+			});
+
+			const wordsInLanguage2 = filteredData.map(({ word, translation, sourceLanguage, translatedTo }) => {
+				if (sourceLanguage === language2 && translatedTo === language1) {
+					return translation;
+				}
+				return word;
+			});
+
+			setQuestions(wordsInLanguage2);
+			setAnswers(wordsInLanguage1);
+
 			setSentenceOriginal(
 				filteredData.map(({ contextSentence }) => contextSentence)
 			);
@@ -156,7 +172,7 @@ const Quiz = () => {
 				setTimeout(() => {
 					setAttempts(0);
 					setDisplayInput(true);
-				}, 2000);
+				}, 1000);
 			} else if (isLastQuestion) {
 				const formattedDateToday = new Date().toISOString().split('T')[0]
 				const logData = {
@@ -185,7 +201,7 @@ const Quiz = () => {
 
 	return (
 		<Container className="mt-4">
-			<div style={{width: '50%'}}>
+			<div style={{ width: '50%' }}>
 				<h1>Quiz Game with Hints</h1>
 				<div style={{ color: correct === true ? "green" : "red", fontSize: "30px", display: !gameFinished ? "none" : "block" }}>{feedback}</div>
 				{gameStarted &&
@@ -199,7 +215,7 @@ const Quiz = () => {
 
 							<div style={{ display: displayInput ? "block" : "none" }}>
 								<div><strong>Question #{currentQuestionIndex + 1}</strong></div>
-								<div>Translate: <strong>{output}</strong></div>
+								<div>Translate: <strong>{question}</strong></div>
 							</div>
 							<div style={{ color: correct === true ? "green" : "red", fontSize: "30px", display: displayInput ? "none" : "block" }}>{feedback}</div>
 
@@ -249,18 +265,18 @@ const Quiz = () => {
 					<Button onClick={restartQuiz}>Restart</Button>
 				)}
 			</div>
-				{!gameStarted &&
-					<QuizInitialization
-						language1={language1}
-						language2={language2}
-						quizType={quizType}
-						startGame={startGame}
-						handleLanguage1Change={(e) => setLanguage1(e.target.value)}
-						handleLanguage2Change={(e) => setLanguage2(e.target.value)}
-						handleQuizTypeChange={(e) => setQuizType(e.target.value)}
-						handleMultipleChoiceChange={(e) => setMultipleChoice(e.target.checked)}
-					/>}
-				<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
+			{!gameStarted &&
+				<QuizInitialization
+					language1={language1}
+					language2={language2}
+					quizType={quizType}
+					startGame={startGame}
+					handleLanguage1Change={(e) => setLanguage1(e.target.value)}
+					handleLanguage2Change={(e) => setLanguage2(e.target.value)}
+					handleQuizTypeChange={(e) => setQuizType(e.target.value)}
+					handleMultipleChoiceChange={(e) => setMultipleChoice(e.target.checked)}
+				/>}
+			<QuizAnimation {...{ currentQuestionIndex, questions }}></QuizAnimation>
 		</Container >
 	);
 };
