@@ -14,6 +14,11 @@ export default function CsvWordTable({ csvData }) {
 		console.log(csvData);
 	}, []);
 
+	const dateFormatter = (params) => {
+		const timestamp = +params.value;
+		var date = new Date(timestamp);
+		return date.toLocaleString();
+	};
 
 	const columnDefs = [
 		{
@@ -49,6 +54,11 @@ export default function CsvWordTable({ csvData }) {
 			field: "book.isbn",
 			width: 150,
 			filter: true,
+		},
+		{
+			headerName: "Time stamp",
+			field: "timestamp",
+			valueFormatter: dateFormatter,
 		},
 	];
 

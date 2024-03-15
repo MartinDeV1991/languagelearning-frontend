@@ -47,6 +47,7 @@ export default function UploadKindleDB() {
 				contextSentence: row.usage,
 				sourceLanguage: row.lang,
 				translatedTo: "EN-GB",
+				timestamp: row.timestamp,
 				book: {
 					title: row.title,
 					author: row.authors,
