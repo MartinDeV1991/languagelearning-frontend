@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Col, Row, Form } from "react-bootstrap";
+import { Button, Col, Row, Form, Tab, Badge, ListGroup } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { uploadFile } from "utils/api";
 import CsvWordTable from "./CsvWordTable";
@@ -8,7 +8,9 @@ import Papa from "papaparse";
 export default function UploadKindleDB() {
 	const [file, setFile] = useState(null);
 	const [uploading, setUploading] = useState(false);
-	const [data, setData] = useState([]);
+	const [wordArray, setWordArray] = useState([]);
+	const [booksArray, setBooksArray] = useState([]);
+	const [selectedBook, setSelectedBook] = useState(null);
 
 	const handleFileChange = (e) => {
 		if (e.target.files) {
@@ -35,12 +37,33 @@ export default function UploadKindleDB() {
 		const data = Papa.parse(csv, {
 			header: true,
 		});
-		setData(convertToWordArray(data.data));
+		console.log(data);
+		convertToArrays(data.data);
 	};
 
-	const convertToWordArray = (data) => {
-		const wordArray = [];
+	const convertToArrays = (data) => {
+		// Create an object to store books by their ISBN or title
+		const booksByISBNOrTitle = {};
+		const allWords = [];
+
+		// Iterate over each row of data
 		data.forEach((row) => {
+			// Determine the key for the book object based on the availability of ISBN
+			const key = row.isbn || row.title;
+
+			// Check if the book already exists in the booksByISBNOrTitle object
+			if (!booksByISBNOrTitle[key]) {
+				// If the book does not exist, create a new entry
+				booksByISBNOrTitle[key] = {
+					title: row.title,
+					author: row.authors,
+					language: row.lang,
+					isbn: row.isbn || null, // Use null if ISBN is not available
+					words: [], // Initialize an empty array to store words for this book
+				};
+			}
+
+			// Create a word object for the current row
 			const word = {
 				word: row.word,
 				rootWord: row.stem,
@@ -52,13 +75,21 @@ export default function UploadKindleDB() {
 					title: row.title,
 					author: row.authors,
 					language: row.lang,
-					isbn: row.isbn,
-				},
+					isbn: row.isbn || null,
+				}, // Associate the word with the corresponding book object
 			};
-			wordArray.push(word);
+
+			// Add the word to the words array of the corresponding book
+			booksByISBNOrTitle[key].words.push(word);
+
+			// add word to word array
+			allWords.push(word);
 		});
-		console.log("Word array: ", wordArray);
-		return wordArray;
+
+		// Convert the booksByISBNOrTitle object to an array of book objects
+		setBooksArray(Object.values(booksByISBNOrTitle));
+		setWordArray(allWords);
+		return allWords;
 	};
 
 	return (
@@ -91,12 +122,49 @@ export default function UploadKindleDB() {
 						</Button>
 					</Col>
 				</Row>
-				{data.length > 0 && (
-					<Row className="justify-items-between">
-						<Col>
-							<h4>Select words to import</h4>
-							<CsvWordTable csvData={data} />
-						</Col>
+				{wordArray.length > 0 && (
+					<Row>
+						<Tab.Container id="list-group-tabs-example" defaultActiveKey="#all">
+							<Col sm={3}>
+								<div className="sidebar">
+									<h5>Books</h5>
+									<ListGroup>
+										<ListGroup.Item action href="#all">
+											All{" "}
+											<Badge bg="primary" pill>
+												{wordArray.length}
+											</Badge>
+										</ListGroup.Item>
+										{booksArray.map((book, index) => (
+											<ListGroup.Item
+												action
+												href={`#${book.title}`}
+												key={index}
+											>
+												{book.title}{" "}
+												<Badge bg="primary" pill>
+													{book.words.length}
+												</Badge>
+											</ListGroup.Item>
+										))}
+									</ListGroup>
+								</div>
+							</Col>
+							<Col sm={9}>
+								<Tab.Content>
+									<Tab.Pane eventKey="#all">
+										<h4>All books</h4>
+										<CsvWordTable csvData={wordArray} />
+									</Tab.Pane>
+									{booksArray.map((book, index) => (
+										<Tab.Pane eventKey={`#${book.title}`} key={index}>
+											<h4>{book.title}</h4>
+											<CsvWordTable csvData={book.words} />
+										</Tab.Pane>
+									))}
+								</Tab.Content>
+							</Col>
+						</Tab.Container>
 					</Row>
 				)}
 			</Col>
