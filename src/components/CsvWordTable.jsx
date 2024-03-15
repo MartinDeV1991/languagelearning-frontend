@@ -12,7 +12,7 @@ export default function CsvWordTable({ csvData }) {
 
 	useEffect(() => {
 		console.log(csvData);
-	}, []);
+	}, [csvData]);
 
 	const dateFormatter = (params) => {
 		const timestamp = +params.value;

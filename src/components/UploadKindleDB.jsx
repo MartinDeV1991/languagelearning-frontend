@@ -10,7 +10,6 @@ export default function UploadKindleDB() {
 	const [uploading, setUploading] = useState(false);
 	const [wordArray, setWordArray] = useState([]);
 	const [booksArray, setBooksArray] = useState([]);
-	const [selectedBook, setSelectedBook] = useState(null);
 
 	const handleFileChange = (e) => {
 		if (e.target.files) {
