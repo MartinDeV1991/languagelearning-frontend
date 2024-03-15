@@ -62,6 +62,7 @@ export default function UploadCSV() {
 				contextSentence: row.usage,
 				sourceLanguage: sourceLanguage,
 				translatedTo: translatedTo,
+				timestamp: new Date(),
 				book: {
 					title: row.book,
 					author: row.authors,
@@ -101,6 +102,7 @@ export default function UploadCSV() {
 				</Row>
 				{data.length > 0 && (
 					<Row className="justify-items-between">
+						<hr className="mt-3" />
 						<Col>
 							<h4>Select words to import</h4>
 							<CsvWordTable csvData={data} />
