@@ -123,6 +123,7 @@ export default function UploadKindleDB() {
 				</Row>
 				{wordArray.length > 0 && (
 					<Row>
+						<hr className="mt-3" />
 						<Tab.Container id="list-group-tabs-example" defaultActiveKey="#all">
 							<Col sm={3}>
 								<div className="sidebar">
