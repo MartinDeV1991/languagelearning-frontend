@@ -4,20 +4,17 @@ import { toast } from "react-toastify";
 const BASE_URL = process.env.REACT_APP_PATH;
 
 // Common headers, if any, can be defined here
-const headers = {
-	"Content-Type": "application/json",
-	Authorization: localStorage.getItem("languagelearning_token"),
-	userId: localStorage.getItem("languagelearning_id"),
-};
-
-const setHeaders = () => {
-	headers.Authorization = localStorage.getItem("languagelearning_token");
-	headers.userId = localStorage.getItem("languagelearning_id");
+const getDefaultHeaders = () => {
+	return {
+		"Content-Type": "application/json",
+		Authorization: localStorage.getItem("languagelearning_token"),
+		userId: localStorage.getItem("languagelearning_id"),
+	};
 };
 
 // GET requests (they provide own error handling and toast)
 export const fetchData = async (endpoint) => {
-	setHeaders();
+	const headers = getDefaultHeaders();
 	try {
 		const response = await fetch(`${BASE_URL}/${endpoint}`, { headers });
 		if (!response.ok)
@@ -34,7 +31,7 @@ export const fetchData = async (endpoint) => {
 
 // POST requests (throws errors that need to be handled)
 export const postData = async (endpoint, data) => {
-	setHeaders();
+	const headers = getDefaultHeaders();
 	try {
 		const response = await fetch(`${BASE_URL}/${endpoint}`, {
 			method: "POST",
@@ -52,7 +49,7 @@ export const postData = async (endpoint, data) => {
 
 // PUT requests (throws errors that need to be handled)
 export const putData = async (endpoint, data = null) => {
-	setHeaders();
+	const headers = getDefaultHeaders();
 	console.log(endpoint, "data= " + data);
 	try {
 		const fetchOptions = {
@@ -80,7 +77,7 @@ export const putData = async (endpoint, data = null) => {
 
 // DELETE requests (one id)
 export const deleteOne = async (endpoint, id) => {
-	setHeaders();
+	const headers = getDefaultHeaders();
 	try {
 		const response = await fetch(`${BASE_URL}/${endpoint}/${id}`, {
 			method: "DELETE",
@@ -100,7 +97,7 @@ export const deleteOne = async (endpoint, id) => {
 
 // DELETE requests (give array of ids)
 export const deleteMultiple = async (endpoint, arrayOfIds) => {
-	setHeaders();
+	const headers = getDefaultHeaders();
 	try {
 		const response = await fetch(`${BASE_URL}/${endpoint}`, {
 			method: "DELETE",
@@ -120,7 +117,6 @@ export const deleteMultiple = async (endpoint, arrayOfIds) => {
 };
 
 export const uploadFile = async (endpoint, file) => {
-	setHeaders();
 	const formData = new FormData();
 	formData.append("file", file);
 
