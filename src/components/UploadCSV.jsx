@@ -62,6 +62,7 @@ export default function UploadCSV() {
 				contextSentence: row.usage,
 				sourceLanguage: sourceLanguage,
 				translatedTo: translatedTo,
+				timestamp: new Date(),
 				book: {
 					title: row.book,
 					author: row.authors,
