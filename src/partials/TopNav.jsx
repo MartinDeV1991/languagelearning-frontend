@@ -1,25 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Container, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "utils/AuthContext";
 
 export default function TopNav() {
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
-	const [name, setName] = useState(null);
+	const { isLoggedIn, setIsLoggedIn, name, setName } = useAuth();
 	const navigate = useNavigate();
-
-	useEffect(() => {
-		const token = localStorage.getItem("languagelearning_token");
-		setIsLoggedIn(!!token);
-
-		updateName(); // Update name when component mounts
-	}, []);
-
-	// Function to update the name based on the token
-	const updateName = () => {
-		const firstName = localStorage.getItem("languagelearning_first_name");
-		setName(firstName || null);
-	};
 
 	const logOutUser = () => {
 		localStorage.clear();
@@ -51,7 +38,7 @@ export default function TopNav() {
 				</Nav>
 				<Nav className="ms-auto">
 					<NavDropdown
-						title={name ? `${name}'s account` : "Account"}
+						title={isLoggedIn && name ? `${name}'s account` : "Account"}
 						id="basic-nav-dropdown"
 						align="end"
 						data-bs-theme="light"

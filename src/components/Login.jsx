@@ -3,11 +3,13 @@ import { Container, Form, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { postData } from "utils/api";
+import { useAuth } from "utils/AuthContext";
 
 const Login = () => {
 	const navigate = useNavigate();
 	const [email, setEmail] = useState();
 	const [password, setPassword] = useState();
+	const { setIsLoggedIn } = useAuth();
 
 	const handleChangeEmail = (e) => {
 		setEmail(e.target.value);
@@ -34,16 +36,17 @@ const Login = () => {
 				localStorage.setItem("languagelearning_first_name", data[0].firstName);
 				localStorage.setItem("languagelearning_last_name", data[0].lastName);
 				localStorage.setItem("languagelearning_id", data[0].id);
+				setIsLoggedIn(true);
 				navigate(`/`);
 			} else {
 				localStorage.setItem("languagelearning_id", "1");
 				localStorage.setItem("languagelearning_first_name", "User");
+				setIsLoggedIn(true);
 				navigate(`/`);
 			}
 		} catch (error) {
 			console.error("Error:", error);
-			localStorage.setItem("languagelearning_id", "1");
-			localStorage.setItem("languagelearning_first_name", "User");
+			// add error message here
 			navigate(`/`);
 		}
 	};
