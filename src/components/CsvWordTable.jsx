@@ -1,17 +1,19 @@
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-balham.css"; // Theme
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { postData } from "utils/api";
 
 export default function CsvWordTable({ csvData }) {
 	const gridRef = React.useRef(null);
-	const [rowData, setRowData] = useState(csvData);
 	const user_id = localStorage.getItem("languagelearning_id");
 	const [selectedWords, setSelectedWords] = useState([]);
 
-	setRowData(csvData);
+	useEffect(() => {
+		console.log(csvData);
+	}, []);
+
 
 	const columnDefs = [
 		{
@@ -55,6 +57,7 @@ export default function CsvWordTable({ csvData }) {
 		const selectedWordObjects = [];
 		selectedNodes.forEach((node) => {
 			selectedWordObjects.push(node.data);
+			return node;
 		});
 		setSelectedWords(selectedWordObjects);
 	};
@@ -86,7 +89,7 @@ export default function CsvWordTable({ csvData }) {
 				<AgGridReact
 					ref={gridRef}
 					columnDefs={columnDefs}
-					rowData={rowData}
+					rowData={csvData}
 					pagination={true}
 					rowSelection="multiple"
 					rowMultiSelectWithClick={true}
