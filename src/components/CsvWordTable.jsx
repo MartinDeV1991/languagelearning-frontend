@@ -1,8 +1,8 @@
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css"; // Core CSS
 import "ag-grid-community/styles/ag-theme-balham.css"; // Theme
-import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import React, { useCallback, useEffect, useState } from "react";
+import { Accordion, Button } from "react-bootstrap";
 import { postData } from "utils/api";
 
 export default function CsvWordTable({ csvData }) {
@@ -19,6 +19,10 @@ export default function CsvWordTable({ csvData }) {
 		var date = new Date(timestamp);
 		return date.toLocaleString();
 	};
+
+	const onBtnExport = useCallback(() => {
+		gridRef.current.api.exportDataAsCsv();
+	}, []);
 
 	const columnDefs = [
 		{
@@ -88,13 +92,14 @@ export default function CsvWordTable({ csvData }) {
 				that filter. When you have chosen your words, click the button below to
 				import them.
 			</p>
-			{/* Click a book title to select all words from that book:
-			<div>
-				<Button onClick={selectRowsFromBook}>
-					Select all rows from book "De getemde man"
-				</Button>
-				<Button onClick={() => setSelectedBook(null)}>Reset</Button>
-			 </div> */}
+			<Button
+				size="sm"
+				variant="outline-dark"
+				className="ms-auto"
+				onClick={onBtnExport}
+			>
+				Export this table as a csv file
+			</Button>
 			<div className="ag-theme-balham" style={{ height: 600, width: "100%" }}>
 				<AgGridReact
 					ref={gridRef}
@@ -106,6 +111,18 @@ export default function CsvWordTable({ csvData }) {
 					onSelectionChanged={onSelectionChanged} // Event listener when selected rows changes
 				/>
 			</div>
+			<Accordion className="mt-3">
+				<Accordion.Item eventKey="0">
+					<Accordion.Header>Import settings</Accordion.Header>
+					<Accordion.Body>
+						<p>Translate to: EN-GB</p>
+						<small>
+							It is not yet possible to choose a different language to translate
+							the words to, this feature is coming soon.
+						</small>
+					</Accordion.Body>
+				</Accordion.Item>
+			</Accordion>
 			<Button className="mt-3" onClick={importWords}>
 				Import words
 			</Button>
